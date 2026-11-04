@@ -4,7 +4,7 @@
 
 // ✅ Google Apps Script Web App URL
 window.API_URL =
-  "https://script.google.com/macros/s/AKfycbxvFcqf2Txf0cOVKL5t-e7T6tZdY6AL6WpMHmKyZiYEer-yyjWpe2spqCQpUTgQTkCX/exec";
+  "https://script.google.com/macros/s/AKfycbwrqHeI1cjKpoCnVWROCJH5_gUgKCzOCfM1wy-upk5X9aMZmqLYCH6xXeXsmIKZJtvx/exec";
 
 // ✅ Backup name used by some pages
 window.SCRIPT_URL = window.API_URL;
