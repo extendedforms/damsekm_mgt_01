@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Admin Monitor</title>
+<style>
+table{width:100%;border-collapse:collapse;}
+td,th{border:1px solid #ccc;padding:8px;}
+</style>
+</head>
+<body>
+
+<h2>Live CBT Monitoring</h2>
+<table>
+<thead>
+<tr><th>Roll</th><th>Name</th><th>Status</th><th>Violations</th><th>Time</th></tr>
+</thead>
+<tbody id="data"></tbody>
+</table>
+
+<script>
+setInterval(()=>{
+fetch("https://YOUR_FIREBASE_DB.firebaseio.com/live.json")
+.then(r=>r.json())
+.then(d=>{
+let html="";
+for(let k in d){
+html+=`<tr>
+<td>${k}</td>
+<td>${d[k].name}</td>
+<td>${d[k].status}</td>
+<td>${d[k].violations}</td>
+<td>${d[k].time}</td>
+</tr>`;
+}
+document.getElementById("data").innerHTML=html;
+});
+},2000);
+</script>
+
+</body>
+</html>
