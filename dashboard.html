@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Admin Dashboard</title>
+<style>
+table{width:100%;border-collapse:collapse}
+td,th{border:1px solid #ccc;padding:6px}
+th{background:#003366;color:white}
+</style>
+</head>
+<body>
+
+<h2>All Student Results</h2>
+
+<table>
+<tr>
+<th>Roll</th><th>Name</th><th>Score</th>
+<th>Correct</th><th>Time</th><th>Violations</th>
+</tr>
+<tbody id="rows"></tbody>
+</table>
+
+<script>
+if(localStorage.getItem("admin")!=="yes"){
+  location.href="admin.html";
+}
+
+let results = JSON.parse(localStorage.getItem("results")) || [];
+results.forEach(r=>{
+  rows.innerHTML += `<tr>
+    <td>${r.roll}</td>
+    <td>${r.name}</td>
+    <td>${r.score}</td>
+    <td>${r.correct}</td>
+    <td>${r.time}</td>
+    <td>${r.violations}</td>
+  </tr>`;
+});
+</script>
+
+</body>
+</html>
