@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DAMS TVM-ZENITH HIGH NEET PG MOCK TEST SERIES - Login</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+  <div class="login-container">
+
+    <!-- Logo -->
+    <img src="IMG_3984.jpeg" class="logo" alt="Institution Logo">
+
+    <!-- Institution Name -->
+    <h2 class="inst-name">ZENITH HIGH & DAMS TRIVANDRUM</h2>
+
+    <!-- Title -->
+    <h3 class="title">NEET PG MOCK TEST SERIES Login</h3>
+
+    <!-- Form -->
+    <div class="form">
+      <input type="text" id="fullName" placeholder="Full Name" autocomplete="name">
+      <input type="tel" id="phone" placeholder="Phone Number" autocomplete="tel">
+      <input type="email" id="email" placeholder="Email" autocomplete="email">
+      <input type="text" id="cid" placeholder="Candidate ID" autocomplete="username">
+
+      <div class="password-box">
+        <input type="password" id="pwd" placeholder="Password" autocomplete="current-password">
+        <span class="toggle" onclick="togglePassword()">👁</span>
+      </div>
+
+      <button type="button" onclick="login()">Login</button>
+
+      <p id="msg"></p>
+    </div>
+  </div>
+
+  <!-- ✅ Load config first, then login logic -->
+  <script src="config.js"></script>
+  <script src="login.js"></script>
+
+</body>
+</html>
