@@ -4,7 +4,7 @@
 
 // ✅ Google Apps Script Web App URL
 window.API_URL =
-  "https://script.google.com/macros/s/AKfycbwrqHeI1cjKpoCnVWROCJH5_gUgKCzOCfM1wy-upk5X9aMZmqLYCH6xXeXsmIKZJtvx/exec";
+  "https://script.google.com/macros/s/AKfycbzwgEOh1fYnKiWXXjtYpcX4TS4aPACApijXsh1u5FZIJj-JjMrya9CEM54JqdgjLLW65w/exec";
 
 // ✅ Backup name used by some pages
 window.SCRIPT_URL = window.API_URL;
@@ -27,6 +27,7 @@ window.EXAM_TZ = "Asia/Kolkata";
 
 // ✅ Fixed exam window in IST
 window.EXAM_START_IST = "2026-08-27T10:00:00+05:30";
+window.EXAM_END_IST   = "2026-08-27T13:30:00+05:30";
 window.EXAM_END_IST   = "2026-09-27T13:30:00+05:30";
 
 // ✅ Parsed milliseconds
