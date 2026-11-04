@@ -2,7 +2,7 @@
  NEET-PG CBT ENGINE + BASIC PROCTORING + GOOGLE SHEET SUBMIT
 ****************/
 
-const API_URL = "https://script.google.com/macros/s/AKfycbwyFqjWYNDeC6H2TAbwSO0wld-9-DgsU-Kq7UGYzSoj4-2gYrr0Yu8tipL1uEPm2Ybnkw/exec";
+const API_URL = "https://script.google.com/macros/s/AKfycbwrqHeI1cjKpoCnVWROCJH5_gUgKCzOCfM1wy-upk5X9aMZmqLYCH6xXeXsmIKZJtvx/exec";
 
 // ===== Candidate gate (must be logged in) =====
 function safeJsonParse(str){ try { return JSON.parse(str); } catch { return null; } }
