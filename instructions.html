@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>DAMS TVM-ZENITH HIGH NEET PG MOCK TEST SERIES - Instructions</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #eef3f9;
+      color: #111827;
+    }
+
+    .topbar {
+      background: #003b66;
+      color: white;
+      padding: 18px 22px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .brand {
+      font-size: 22px;
+      font-weight: 800;
+      letter-spacing: 0.5px;
+      line-height: 1.25;
+      max-width: 520px;
+    }
+
+    .meta {
+      background: rgba(255, 255, 255, 0.15);
+      padding: 12px 18px;
+      border-radius: 999px;
+      font-size: 16px;
+      font-weight: 700;
+      line-height: 1.4;
+    }
+
+    .ibox {
+      max-width: 900px;
+      margin: 28px auto;
+      background: #ffffff;
+      border-radius: 14px;
+      padding: 32px;
+      box-shadow: 0 4px 18px rgba(0, 0, 0, 0.08);
+    }
+
+    h2 {
+      margin-top: 0;
+      font-size: 34px;
+      color: #111827;
+    }
+
+    .candidateBox {
+      background: #f4f7fb;
+      padding: 14px 16px;
+      border-radius: 10px;
+      margin-bottom: 18px;
+      font-size: 15px;
+      line-height: 1.6;
+    }
+
+    .metaRow {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin: 10px 0 22px;
+    }
+
+    .pill {
+      background: #eef2f7;
+      padding: 12px 14px;
+      border-radius: 10px;
+      font-size: 16px;
+      line-height: 1.4;
+    }
+
+    .status-live {
+      color: #0b7a32;
+    }
+
+    .status-closed {
+      color: #b00020;
+    }
+
+    .status-wait {
+      color: #a86400;
+    }
+
+    ul {
+      line-height: 1.8;
+      font-size: 18px;
+      margin-top: 18px;
+    }
+
+    .btn {
+      background: #003b66;
+      color: #ffffff;
+      border: none;
+      padding: 13px 22px;
+      border-radius: 9px;
+      cursor: pointer;
+      font-weight: 800;
+      font-size: 16px;
+      margin-top: 10px;
+    }
+
+    .btn:disabled {
+      opacity: 0.45;
+      cursor: not-allowed;
+    }
+
+    #msg {
+      color: #b00020;
+      font-weight: 700;
+      margin-top: 12px;
+      font-size: 15px;
+    }
+
+    @media (max-width: 768px) {
+      .topbar {
+        padding: 16px;
+      }
+
+      .brand {
+        font-size: 20px;
+      }
+
+      .meta {
+        font-size: 15px;
+        border-radius: 24px;
+      }
+
+      .ibox {
+        margin: 22px 12px;
+        padding: 24px 20px;
+      }
+
+      h2 {
+        font-size: 30px;
+      }
+
+      ul {
+        font-size: 17px;
+        padding-left: 24px;
+      }
+
+      .pill {
+        font-size: 15px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <header class="topbar">
+    <div class="brand">DAMS TVM-ZENITH HIGH NEET PG MOCK TEST SERIES</div>
+    <div class="meta">IST Time: <b id="istNow">--</b></div>
+  </header>
+
+  <div class="ibox">
+    <h2>Instructions</h2>
+
+    <div class="candidateBox" id="candidateInfo"></div>
+
+    <div class="metaRow">
+      <div class="pill">Start (IST): <b id="startIST">--</b></div>
+      <div class="pill">End (IST): <b id="endIST">--</b></div>
+      <div class="pill">Status: <b id="statusTxt">--</b></div>
+    </div>
+
+    <ul>
+      <li>Read each question carefully before answering.</li>
+      <li>Do not refresh or close the tab during the exam.</li>
+      <li>Tab switching or minimizing the browser may be counted as violations.</li>
+      <li>Use of multiple devices during the examination is strictly prohibited.</li>
+      <li>Click <b>Submit</b> only when you are finished.</li>
+    </ul>
+
+    <button class="btn" id="startBtn" disabled>Start Exam</button>
+
+    <p id="msg"></p>
+  </div>
+
+  <script src="config.js?v=20260709b"></script>
+
+  <script>
+    function safeParse(value) {
+      try {
+        return JSON.parse(value);
+      } catch {
+        return null;
+      }
+    }
+
+    function escapeHtml(text) {
+      return String(text || "")
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+    }
+
+    const cand = safeParse(localStorage.getItem("neet_candidate") || "");
+
+    if (!cand || !cand.token || !cand.candidateId) {
+      window.location.replace("login.html");
+      throw new Error("Login required");
+    }
+
+    if (localStorage.getItem("neet_submitted") === "yes") {
+      window.location.replace("result.html");
+      throw new Error("Already submitted");
+    }
+
+    const istNow = document.getElementById("istNow");
+    const startIST = document.getElementById("startIST");
+    const endIST = document.getElementById("endIST");
+    const statusTxt = document.getElementById("statusTxt");
+    const startBtn = document.getElementById("startBtn");
+    const msg = document.getElementById("msg");
+    const candidateInfo = document.getElementById("candidateInfo");
+
+    candidateInfo.innerHTML =
+      "<b>Name:</b> " + escapeHtml(cand.name || "") +
+      " | <b>ID:</b> " + escapeHtml(cand.candidateId || "") +
+      " | <b>Email:</b> " + escapeHtml(cand.email || "");
+
+    if (typeof window.formatIST !== "function") {
+      window.formatIST = function(dateOrMs = Date.now()) {
+        const d = typeof dateOrMs === "number" ? new Date(dateOrMs) : dateOrMs;
+        return d.toLocaleString("en-IN", {
+          timeZone: "Asia/Kolkata",
+          hour12: true
+        });
+      };
+    }
+
+    if (typeof window.isWithinExamWindow !== "function") {
+      window.isWithinExamWindow = function(nowMs = Date.now()) {
+        if (
+          !Number.isFinite(window.EXAM_START_MS) ||
+          !Number.isFinite(window.EXAM_END_MS)
+        ) {
+          return true;
+        }
+
+        return nowMs >= window.EXAM_START_MS && nowMs <= window.EXAM_END_MS;
+      };
+    }
+
+    function hasValidSchedule() {
+      return (
+        Number.isFinite(window.EXAM_START_MS) &&
+        Number.isFinite(window.EXAM_END_MS)
+      );
+    }
+
+    function showSchedule() {
+      if (hasValidSchedule()) {
+        startIST.textContent = window.formatIST(window.EXAM_START_MS);
+        endIST.textContent = window.formatIST(window.EXAM_END_MS);
+      } else {
+        startIST.textContent = "Not Set";
+        endIST.textContent = "Not Set";
+      }
+    }
+
+    function setStatus(text, className) {
+      statusTxt.textContent = text;
+      statusTxt.className = className || "";
+    }
+
+    function tick() {
+      istNow.textContent = window.formatIST(Date.now());
+
+      if (!hasValidSchedule()) {
+        setStatus("Live", "status-live");
+        startBtn.disabled = false;
+        msg.textContent = "";
+        return;
+      }
+
+      const now = Date.now();
+
+      if (now < window.EXAM_START_MS) {
+        setStatus("Not Started", "status-wait");
+        startBtn.disabled = true;
+        msg.textContent = "Exam has not started yet.";
+        return;
+      }
+
+      if (now > window.EXAM_END_MS) {
+        setStatus("Closed", "status-closed");
+        startBtn.disabled = true;
+        msg.textContent = "Exam time is over.";
+        return;
+      }
+
+      setStatus("Live", "status-live");
+      startBtn.disabled = false;
+      msg.textContent = "";
+    }
+
+    startBtn.addEventListener("click", function() {
+      if (!window.isWithinExamWindow()) {
+        tick();
+        return;
+      }
+
+      window.location.replace("exam.html?v=20260709b");
+    });
+
+    showSchedule();
+    tick();
+    setInterval(tick, 1000);
+
+    history.replaceState(null, "", location.href);
+
+    window.addEventListener("popstate", function() {
+      history.pushState(null, "", location.href);
+    });
+  </script>
+
+</body>
+</html>
