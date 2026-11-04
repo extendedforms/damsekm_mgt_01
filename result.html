@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Result - ZENITH HIGH CBT</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body class="result-page">
+  <div class="result-container">
+    <h1 class="result-heading">Result</h1>
+    <div class="candidate-card">
+      <div class="candidate-line"><strong>Name:</strong> <span id="candName">-</span></div>
+      <div class="candidate-line"><strong>Candidate ID:</strong> <span id="candId">-</span></div>
+      <div class="candidate-line"><strong>Email:</strong> <span id="candEmail">-</span></div>
+      <div class="candidate-line"><strong>Phone:</strong> <span id="candPhone">-</span></div>
+    </div>
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-label">Score</div>
+        <div class="stat-value" id="score">-</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Correct</div>
+        <div class="stat-value" id="correct">-</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Wrong</div>
+        <div class="stat-value" id="wrong">-</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Unattempted</div>
+        <div class="stat-value" id="unattempted">-</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Time Taken</div>
+        <div class="stat-value" id="timeTaken">-</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Violations</div>
+        <div class="stat-value" id="violations">-</div>
+      </div>
+    </div>
+    <div class="result-actions">
+      <button class="result-btn primary" onclick="backToLogin()">Logout</button>
+      <button class="result-btn secondary" onclick="backToLogin()">Back to Login</button>
+    </div>
+    <div class="result-note" id="statusNote"></div>
+  </div>
+  <script>
+    function safeParse(value) {
+      try {
+        return JSON.parse(value);
+      } catch {
+        return null;
+      }
+    }
+    function firstDefined() {
+      for (let i = 0; i < arguments.length; i++) {
+        const value = arguments[i];
+        if (value !== undefined && value !== null && value !== "") {
+          return value;
+        }
+      }
+      return null;
+    }
+    function byPath(obj, path) {
+      if (!obj || !path) return undefined;
+      return path.split(".").reduce(function(acc, key) {
+        return acc && acc[key] !== undefined ? acc[key] : undefined;
+      }, obj);
+    }
+    function setText(id, value, fallback) {
+      document.getElementById(id).textContent =
+        value !== undefined && value !== null && value !== "" ? value : fallback;
+    }
+    function formatTime(seconds) {
+      const sec = Number(seconds);
+      if (!Number.isFinite(sec) || sec < 0) return "-";
+      const h = Math.floor(sec / 3600);
+      const m = Math.floor((sec % 3600) / 60);
+      const s = sec % 60;
+      if (h > 0) {
+        return h + " hr " + m + " min " + s + " sec";
+      }
+      if (m > 0) {
+        return m + " min " + s + " sec";
+      }
+      return s + " sec";
+    }
+    const candidate = safeParse(localStorage.getItem("neet_candidate") || "") || {};
+    const result = safeParse(localStorage.getItem("neet_result") || "") || {};
+    if (!candidate || !candidate.candidateId) {
+      window.location.replace("login.html?v=" + Date.now());
+    }
+    setText("candName", candidate.name || "-", "-");
+    setText("candId", candidate.candidateId || "-", "-");
+    setText("candEmail", candidate.email || "-", "-");
+    setText("candPhone", candidate.phone || "-", "-");
+    const score = firstDefined(
+      result.score,
+      result.marks,
+      result.totalScore,
+      byPath(result, "data.score"),
+      byPath(result, "data.marks"),
+      byPath(result, "result.score"),
+      byPath(result, "summary.score")
+    );
+    const correct = firstDefined(
+      result.correct,
+      result.correctCount,
+      byPath(result, "data.correct"),
+      byPath(result, "data.correctCount"),
+      byPath(result, "result.correct"),
+      byPath(result, "summary.correct")
+    );
+    const wrong = firstDefined(
+      result.wrong,
+      result.wrongCount,
+      byPath(result, "data.wrong"),
+      byPath(result, "data.wrongCount"),
+      byPath(result, "result.wrong"),
+      byPath(result, "summary.wrong")
+    );
+    const unattempted = firstDefined(
+      result.unattempted,
+      result.unanswered,
+      byPath(result, "data.unattempted"),
+      byPath(result, "data.unanswered"),
+      byPath(result, "result.unattempted"),
+      byPath(result, "summary.unattempted")
+    );
+    const timeTakenSec = firstDefined(
+      result.timeTakenSec,
+      result.timeTaken,
+      byPath(result, "data.timeTakenSec"),
+      byPath(result, "result.timeTakenSec"),
+      byPath(result, "summary.timeTakenSec")
+    );
+    const violations = firstDefined(
+      result.violationCount,
+      result.violations,
+      byPath(result, "data.violationCount"),
+      byPath(result, "data.violations"),
+      byPath(result, "result.violationCount"),
+      byPath(result, "summary.violationCount")
+    );
+    setText("score", score, "-");
+    setText("correct", correct, "-");
+    setText("wrong", wrong, "-");
+    setText("unattempted", unattempted, "-");
+    setText("timeTaken", formatTime(timeTakenSec), "-");
+    setText("violations", violations, "0");
+    const statusNote = document.getElementById("statusNote");
+    if (result.status === "success" || result.ok === true) {
+      statusNote.textContent = "Exam submitted successfully.";
+    } else if (result.message) {
+      statusNote.textContent = result.message;
+    } else {
+      statusNote.textContent = "Result loaded.";
+    }
+    function clearExamStorage() {
+      localStorage.removeItem("neet_candidate");
+      localStorage.removeItem("neet_submitted");
+      localStorage.removeItem("neet_result");
+      localStorage.removeItem("neet_pending_submission");
+      localStorage.removeItem("candidateId");
+      localStorage.removeItem("token");
+      localStorage.removeItem("candidateName");
+      localStorage.removeItem("candidatePhone");
+      localStorage.removeItem("candidateEmail");
+      const keysToDelete = [];
+      for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i);
+        if (!key) continue;
+        if (
+          key.startsWith("neet_exam_state_") ||
+          key.startsWith("neet_question_order_")
+        ) {
+          keysToDelete.push(key);
+        }
+      }
+      keysToDelete.forEach(function(key) {
+        localStorage.removeItem(key);
+      });
+    }
+    function backToLogin() {
+      clearExamStorage();
+      window.location.href = "login.html?v=" + Date.now();
+    }
+  </script>
+</body>
+</html>
