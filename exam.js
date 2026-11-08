@@ -578,7 +578,6 @@ if (clearBtn) {
     if (q) {
       clearAnswer(q.id);
       render();
-      scrollToQuestionTop();
     }
   });
 }
@@ -590,7 +589,6 @@ if (markBtn) {
     if (q) {
       toggleMark(q.id);
       render();
-      scrollToQuestionTop();
     }
   });
 }
