@@ -1,406 +1,506 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="theme-color" content="#071a32" />
-  <title>Result - DAMS Trivandrum Mock Test Series</title>
-  <link rel="stylesheet" href="style.css" />
-  <style>
-    * { box-sizing: border-box; }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#071a32">
 
-    html, body {
+  <title>NEET PG MOCK TEST SERIES - Login</title>
+
+  <link rel="stylesheet" href="style.css">
+
+  <style>
+    :root {
+      --login-navy: #0a2342;
+      --login-blue: #174a7c;
+      --login-gold: #d9ad62;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
       width: 100%;
       min-height: 100%;
       margin: 0;
     }
 
-    body.result-page {
+    body {
       min-height: 100vh;
       min-height: 100svh;
-      padding: 12px;
-      display: flex;
+
+      display: flex !important;
+      align-items: center !important;
+      justify-content: flex-end !important;
+
+      padding: 30px 18px;
+
+      background-color: #10243d;
+
+      background-image:
+        linear-gradient(
+          115deg,
+          rgba(5, 18, 35, .72) 0%,
+          rgba(7, 25, 47, .48) 48%,
+          rgba(6, 18, 34, .62) 100%
+        ),
+        url("IMG_4057.jpeg");
+
+      background-size: cover;
+      background-position: center center;
+      background-attachment: fixed;
+    }
+
+    .login-container {
+      width: min(520px, 100%) !important;
+      max-width: 520px !important;
+
+      margin: 0 5vw 0 auto !important;
+
+      float: none !important;
+      position: relative !important;
+      left: auto !important;
+      right: auto !important;
+      transform: none !important;
+
+      flex: 0 1 520px;
+
+      padding: 30px clamp(22px, 4vw, 42px);
+
+      border: 1px solid rgba(255,255,255,.78);
+      border-radius: 22px;
+
+      background: rgba(255,255,255,.97);
+
+      box-shadow: 0 26px 75px rgba(0,0,0,.32);
+
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+
+      text-align: left;
+    }
+
+    /* DAMS Trivandrum Logo — larger and centred */
+
+    .logo {
+      display: block !important;
+
+      width: min(100%, 390px);
+      height: auto;
+      max-height: 120px;
+
+      object-fit: contain;
+      object-position: center center;
+
+      margin: 0 auto 22px;
+
+      border: 0;
+      border-radius: 0;
+      box-shadow: none;
+
+      background: transparent;
+    }
+
+    /* Candidate portal label */
+
+    .login-container::before {
+      content: "CANDIDATE PORTAL";
+
+      display: block;
+      width: max-content;
+
+      margin: 0 0 15px;
+      padding: 7px 11px;
+
+      border-left: 3px solid var(--login-gold);
+      border-radius: 3px;
+
+      background: #f2f5f9;
+      color: var(--login-blue);
+
+      font-size: 10px;
+      font-weight: 900;
+      letter-spacing: .16em;
+    }
+
+    /* Institution name */
+
+    .inst-name {
+      margin: 0;
+
+      color: var(--login-navy);
+
+      font-size: clamp(23px, 3vw, 30px);
+      line-height: 1.18;
+
+      letter-spacing: -.025em;
+      font-weight: 900;
+
+      text-align: center;
+    }
+
+    .title {
+      margin: 10px 0 25px;
+
+      color: #667085;
+
+      font-size: 14px;
+      line-height: 1.5;
+      font-weight: 600;
+
+      text-align: center;
+    }
+
+    /* Login form */
+
+    .form {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+
+      gap: 13px;
+
+      text-align: left;
+    }
+
+    .form > input,
+    .password-box input {
+      width: 100%;
+      min-width: 0;
+      height: 49px;
+
+      border: 1px solid #d5dce6;
+      border-radius: 10px;
+
+      padding: 0 13px;
+
+      background: #fff;
+      color: #172235;
+
+      font: inherit;
+      font-size: 14px;
+
+      outline: none;
+
+      transition:
+        border-color .18s ease,
+        box-shadow .18s ease;
+    }
+
+    .form > input:focus,
+    .password-box input:focus {
+      border-color: var(--login-blue);
+
+      box-shadow:
+        0 0 0 3px rgba(23,74,124,.12);
+    }
+
+    .form > input::placeholder,
+    .password-box input::placeholder {
+      color: #98a2b3;
+    }
+
+    /* Password field */
+
+    .password-box {
+      position: relative;
+
+      grid-column: 1 / -1;
+
+      width: 100%;
+    }
+
+    .password-box input {
+      padding-right: 50px;
+    }
+
+    .toggle {
+      position: absolute;
+
+      top: 50%;
+      right: 13px;
+
+      transform: translateY(-50%);
+
+      display: inline-flex;
       align-items: center;
       justify-content: center;
-      overflow-x: hidden;
-      overflow-y: auto;
-      background: #f3f5f9;
-      color: #26364f;
-      font-family: Arial, Helvetica, sans-serif;
-    }
 
-    .result-container {
-      width: min(100%, 1050px);
-      margin: 0 auto;
-      padding: 18px 22px 14px;
-      border: 1px solid #e1e6ee;
-      border-radius: 18px;
-      background: rgba(255,255,255,.98);
-      box-shadow: 0 12px 36px rgba(20, 39, 66, .10);
-    }
+      width: 34px;
+      height: 34px;
 
-    .institution-heading {
-      margin: 0 0 5px;
-      color: #174a7c;
-      text-align: center;
-      text-transform: uppercase;
-      font-size: clamp(17px, 2.4vw, 24px);
-      line-height: 1.15;
-      letter-spacing: .055em;
-      font-weight: 900;
-    }
-
-    .result-heading {
-      margin: 0 0 13px;
-      color: #0a2342;
-      text-align: center;
-      font-size: clamp(25px, 3.4vw, 34px);
-      line-height: 1.1;
-      font-weight: 900;
-    }
-
-    .candidate-card {
-      display: grid;
-      grid-template-columns: repeat(4, minmax(0, 1fr));
-      gap: 8px 16px;
-      margin: 0 0 12px;
-      padding: 12px 15px;
-      border: 1px solid #e1e6ee;
-      border-radius: 13px;
-      background: #fff;
-    }
-
-    .candidate-line {
-      min-width: 0;
-      font-size: 14px;
-      line-height: 1.35;
-      overflow-wrap: anywhere;
-    }
-
-    .candidate-line strong {
-      color: #34445e;
-    }
-
-    .stats-grid {
-      display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: 9px;
-      margin: 0 0 12px;
-    }
-
-    .stat-card {
-      min-width: 0;
-      min-height: 78px;
-      padding: 10px 14px;
-      border: 1px solid #e1e6ee;
-      border-radius: 13px;
-      background: #fff;
-    }
-
-    .stat-label {
-      margin-bottom: 3px;
-      color: #58677d;
-      font-size: 13px;
-      font-weight: 800;
-    }
-
-    .stat-value {
-      color: #26364f;
-      font-size: clamp(23px, 3vw, 30px);
-      line-height: 1.05;
-      font-weight: 900;
-      overflow-wrap: anywhere;
-    }
-
-    .result-actions {
-      display: flex;
-      justify-content: center;
-      gap: 10px;
-      margin-top: 2px;
-    }
-
-    .result-btn {
-      min-width: 145px;
-      min-height: 42px;
-      padding: 9px 18px;
       border: 0;
-      border-radius: 9px;
-      font-size: 14px;
-      font-weight: 800;
+      border-radius: 8px;
+
+      background: transparent;
+      color: #52657c;
+
       cursor: pointer;
+      font-size: 19px;
     }
 
-    .result-btn.primary {
-      background: #174a7c;
+    /* Login button */
+
+    .form > button {
+      grid-column: 1 / -1;
+
+      width: 100%;
+      min-height: 51px;
+
+      margin-top: 4px;
+
+      border: 0;
+      border-radius: 10px;
+
+      background:
+        linear-gradient(100deg, #0b2b50, #1a5285);
+
       color: #fff;
+
+      font-size: 15px;
+      font-weight: 850;
+      letter-spacing: .02em;
+
+      cursor: pointer;
+
+      box-shadow:
+        0 8px 18px rgba(13,49,85,.20);
+
+      transition:
+        transform .18s ease,
+        box-shadow .18s ease;
     }
 
-    .result-btn.secondary {
-      background: #e9eef5;
-      color: #26364f;
+    .form > button:hover {
+      transform: translateY(-1px);
+
+      box-shadow:
+        0 11px 22px rgba(13,49,85,.25);
     }
 
-    .result-note {
-      min-height: 16px;
-      margin-top: 7px;
-      color: #68778b;
+    #msg {
+      grid-column: 1 / -1;
+
+      min-height: 20px;
+      margin: 0;
+
       text-align: center;
-      font-size: 12px;
+      font-size: 13px;
+
+      overflow-wrap: anywhere;
     }
 
-    /* Keep the full result compact on common laptop screens. */
-    @media (min-width: 761px) and (max-height: 850px) {
-      body.result-page { padding: 8px; }
-      .result-container { padding: 13px 18px 9px; }
-      .result-heading { margin-bottom: 9px; }
-      .candidate-card { padding: 9px 13px; margin-bottom: 9px; }
-      .stats-grid { gap: 7px; margin-bottom: 9px; }
-      .stat-card { min-height: 68px; padding: 8px 12px; }
-      .result-btn { min-height: 38px; }
-      .result-note { margin-top: 4px; }
+    /* Footer */
+
+    .login-container::after {
+      content:
+        "Powered by ZENITH HIGH";
+
+      display: block;
+
+      margin-top: 22px;
+      padding-top: 15px;
+
+      border-top: 1px solid #e8edf3;
+
+      color: #7b8796;
+
+      text-align: center;
+
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: .04em;
+
+      line-height: 1.5;
     }
+
+    /* Mobile responsive design */
 
     @media (max-width: 760px) {
-      body.result-page {
-        padding: 8px;
-        align-items: center;
+
+      body {
+        padding: 18px 13px;
+
+        justify-content: center !important;
+
+        background-attachment: scroll;
+        background-position: center center;
       }
 
-      .result-container {
-        padding: 13px 12px 9px;
-        border-radius: 14px;
+      .login-container {
+        width: min(470px, 100%) !important;
+        max-width: 470px !important;
+
+        margin: 0 auto !important;
+
+        padding: 25px 19px 21px;
+
+        border-radius: 18px;
       }
 
-      .institution-heading {
-        font-size: clamp(15px, 4.2vw, 20px);
-        letter-spacing: .035em;
+      .logo {
+        width: min(100%, 340px);
+        max-height: 105px;
+
+        margin: 0 auto 18px;
       }
 
-      .result-heading {
-        margin-bottom: 9px;
-        font-size: 27px;
+      .inst-name {
+        font-size: 23px;
       }
 
-      .candidate-card {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-        gap: 7px 10px;
-        padding: 9px 10px;
-        margin-bottom: 9px;
-      }
-
-      .candidate-line { font-size: 12px; }
-
-      .stats-grid {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-        gap: 7px;
-        margin-bottom: 9px;
-      }
-
-      .stat-card {
-        min-height: 62px;
-        padding: 7px 10px;
-        border-radius: 10px;
-      }
-
-      .stat-label { font-size: 11px; }
-      .stat-value { font-size: 23px; }
-
-      .result-actions { gap: 8px; }
-
-      .result-btn {
-        flex: 1;
-        min-width: 0;
-        min-height: 38px;
-        padding: 8px 10px;
+      .title {
+        margin: 9px 0 20px;
         font-size: 13px;
       }
 
-      .result-note { margin-top: 4px; font-size: 11px; }
+      .form {
+        grid-template-columns: 1fr;
+        gap: 11px;
+      }
+
+      .password-box,
+      .form > button,
+      #msg {
+        grid-column: 1;
+      }
+
+      .form > input,
+      .password-box input {
+        height: 48px;
+        font-size: 16px;
+      }
     }
 
     @media (max-width: 360px) {
-      .candidate-line { font-size: 11px; }
-      .stat-card { min-height: 58px; }
-      .stat-value { font-size: 21px; }
+
+      .login-container {
+        padding: 23px 15px 18px;
+      }
+
+      .inst-name {
+        font-size: 21px;
+      }
+
+      .logo {
+        width: min(100%, 300px);
+        max-height: 92px;
+      }
     }
+
+    @media (prefers-reduced-motion: reduce) {
+
+      *,
+      *::before,
+      *::after {
+        transition: none !important;
+      }
+    }
+
   </style>
 </head>
-<body class="result-page">
-  <main class="result-container">
-    <h2 class="institution-heading">DAMS TRIVANDRUM MOCK TEST SERIES</h2>
-    <h1 class="result-heading">Result</h1>
 
-    <section class="candidate-card" aria-label="Candidate details">
-      <div class="candidate-line"><strong>Name:</strong> <span id="candName">-</span></div>
-      <div class="candidate-line"><strong>Candidate ID:</strong> <span id="candId">-</span></div>
-      <div class="candidate-line"><strong>Email:</strong> <span id="candEmail">-</span></div>
-      <div class="candidate-line"><strong>Phone:</strong> <span id="candPhone">-</span></div>
-    </section>
+<body>
 
-    <section class="stats-grid" aria-label="Examination result">
-      <div class="stat-card">
-        <div class="stat-label">Score</div>
-        <div class="stat-value" id="score">-</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-label">Correct</div>
-        <div class="stat-value" id="correct">-</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-label">Wrong</div>
-        <div class="stat-value" id="wrong">-</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-label">Unattempted</div>
-        <div class="stat-value" id="unattempted">-</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-label">Time Taken</div>
-        <div class="stat-value" id="timeTaken">-</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-label">Violations</div>
-        <div class="stat-value" id="violations">-</div>
-      </div>
-    </section>
+  <main class="login-container">
 
-    <div class="result-actions">
-      <button class="result-btn primary" type="button" onclick="backToLogin()">Logout</button>
-      <button class="result-btn secondary" type="button" onclick="backToLogin()">Back to Login</button>
+    <!-- DAMS Logo -->
+
+    <img
+      src="IMG_4060.jpeg"
+      class="logo"
+      alt="DAMS Trivandrum Logo"
+    >
+
+    <!-- Institution Name -->
+
+    <h2 class="inst-name">
+      NEET PG / INICET
+    </h2>
+
+    <!-- Exam Title -->
+
+    <h3 class="title">
+      MOCK TEST SERIES Login
+    </h3>
+
+    <!-- Login Form -->
+
+    <div class="form">
+
+      <input
+        type="text"
+        id="fullName"
+        placeholder="Full Name"
+        autocomplete="name"
+        aria-label="Full Name"
+      >
+
+      <input
+        type="tel"
+        id="phone"
+        placeholder="Phone Number"
+        autocomplete="tel"
+        aria-label="Phone Number"
+      >
+
+      <input
+        type="email"
+        id="email"
+        placeholder="Email"
+        autocomplete="email"
+        aria-label="Email"
+      >
+
+      <input
+        type="text"
+        id="cid"
+        placeholder="Candidate ID"
+        autocomplete="username"
+        aria-label="Candidate ID"
+      >
+
+      <div class="password-box">
+
+        <input
+          type="password"
+          id="pwd"
+          placeholder="Password"
+          autocomplete="current-password"
+          aria-label="Password"
+        >
+
+        <button
+          class="toggle"
+          type="button"
+          onclick="togglePassword()"
+          aria-label="Show or hide password"
+        >👁</button>
+
+      </div>
+
+      <button
+        type="button"
+        onclick="login()"
+      >
+        LOGIN
+      </button>
+
+      <p
+        id="msg"
+        role="status"
+        aria-live="polite"
+      ></p>
+
     </div>
-    <div class="result-note" id="statusNote" role="status" aria-live="polite"></div>
+
   </main>
 
-  <script>
-    function safeParse(value) {
-      try { return JSON.parse(value); } catch (e) { return null; }
-    }
+  <!-- Load config first, then login logic -->
 
-    function firstDefined() {
-      for (let i = 0; i < arguments.length; i++) {
-        const value = arguments[i];
-        if (value !== undefined && value !== null && value !== "") return value;
-      }
-      return null;
-    }
+  <script src="config.js?v=20261108h"></script>
+  <script src="login.js?v=20261108h"></script>
 
-    function byPath(obj, path) {
-      if (!obj || !path) return undefined;
-      return path.split(".").reduce(function(acc, key) {
-        return acc && acc[key] !== undefined ? acc[key] : undefined;
-      }, obj);
-    }
-
-    function setText(id, value, fallback) {
-      const el = document.getElementById(id);
-      if (el) el.textContent =
-        value !== undefined && value !== null && value !== "" ? value : fallback;
-    }
-
-    function formatTime(seconds) {
-      const sec = Number(seconds);
-      if (!Number.isFinite(sec) || sec < 0) return "-";
-      const h = Math.floor(sec / 3600);
-      const m = Math.floor((sec % 3600) / 60);
-      const s = sec % 60;
-      if (h > 0) return h + " hr " + m + " min " + s + " sec";
-      if (m > 0) return m + " min " + s + " sec";
-      return s + " sec";
-    }
-
-    const candidate = safeParse(localStorage.getItem("neet_candidate") || "") || {};
-    const result = safeParse(localStorage.getItem("neet_result") || "") || {};
-
-    if (!candidate || !candidate.candidateId) {
-      window.location.replace("login.html?v=" + Date.now());
-    } else {
-      setText("candName", candidate.name, "-");
-      setText("candId", candidate.candidateId, "-");
-      setText("candEmail", candidate.email, "-");
-      setText("candPhone", candidate.phone, "-");
-    }
-
-    const score = firstDefined(
-      result.score, result.marks, result.totalScore,
-      byPath(result, "data.score"), byPath(result, "data.marks"),
-      byPath(result, "result.score"), byPath(result, "summary.score")
-    );
-
-    const correct = firstDefined(
-      result.correct, result.correctCount,
-      byPath(result, "data.correct"), byPath(result, "data.correctCount"),
-      byPath(result, "result.correct"), byPath(result, "summary.correct")
-    );
-
-    const wrong = firstDefined(
-      result.wrong, result.wrongCount,
-      byPath(result, "data.wrong"), byPath(result, "data.wrongCount"),
-      byPath(result, "result.wrong"), byPath(result, "summary.wrong")
-    );
-
-    const unattempted = firstDefined(
-      result.unattempted, result.unanswered,
-      byPath(result, "data.unattempted"), byPath(result, "data.unanswered"),
-      byPath(result, "result.unattempted"), byPath(result, "summary.unattempted")
-    );
-
-    const timeTakenSec = firstDefined(
-      result.timeTakenSec, result.timeTaken,
-      byPath(result, "data.timeTakenSec"),
-      byPath(result, "result.timeTakenSec"),
-      byPath(result, "summary.timeTakenSec")
-    );
-
-    const violations = firstDefined(
-      result.violationCount, result.violations,
-      byPath(result, "data.violationCount"), byPath(result, "data.violations"),
-      byPath(result, "result.violationCount"),
-      byPath(result, "summary.violationCount")
-    );
-
-    setText("score", score, "-");
-    setText("correct", correct, "-");
-    setText("wrong", wrong, "-");
-    setText("unattempted", unattempted, "-");
-    setText("timeTaken", formatTime(timeTakenSec), "-");
-    setText("violations", violations, "0");
-
-    const statusNote = document.getElementById("statusNote");
-    if (result.status === "success" || result.ok === true) {
-      statusNote.textContent = "Exam submitted successfully.";
-    } else if (result.message) {
-      statusNote.textContent = result.message;
-    } else {
-      statusNote.textContent = "Result loaded.";
-    }
-
-    function clearExamStorage() {
-      localStorage.removeItem("neet_candidate");
-      localStorage.removeItem("neet_submitted");
-      localStorage.removeItem("neet_result");
-      localStorage.removeItem("neet_pending_submission");
-      localStorage.removeItem("candidateId");
-      localStorage.removeItem("token");
-      localStorage.removeItem("candidateName");
-      localStorage.removeItem("candidatePhone");
-      localStorage.removeItem("candidateEmail");
-
-      const keysToDelete = [];
-      for (let i = 0; i < localStorage.length; i++) {
-        const key = localStorage.key(i);
-        if (!key) continue;
-        if (
-          key.startsWith("neet_exam_state_") ||
-          key.startsWith("neet_question_order_")
-        ) keysToDelete.push(key);
-      }
-      keysToDelete.forEach(function(key) { localStorage.removeItem(key); });
-    }
-
-    function backToLogin() {
-      clearExamStorage();
-      window.location.href = "login.html?v=" + Date.now();
-    }
-  </script>
 </body>
 </html>
