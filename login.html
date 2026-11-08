@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -7,12 +8,15 @@
   <title>DAMS TRIVANDRUM NEET PG MOCK TEST SERIES - Login</title>
   <link rel="stylesheet" href="style.css">
 
-  <!-- Login-page-only design overrides; other pages remain unchanged. -->
   <style>
     :root {
       --login-navy: #0a2342;
       --login-blue: #174a7c;
       --login-gold: #d9ad62;
+    }
+
+    * {
+      box-sizing: border-box;
     }
 
     body {
@@ -49,7 +53,6 @@
       text-align: left;
     }
 
-    /* DAMS Trivandrum logo supplied by the user. */
     .logo {
       display: block !important;
       width: min(100%, 310px);
@@ -138,7 +141,9 @@
       width: 100%;
     }
 
-    .password-box input { padding-right: 50px; }
+    .password-box input {
+      padding-right: 50px;
+    }
 
     .toggle {
       position: absolute;
@@ -223,8 +228,14 @@
         margin-bottom: 18px;
       }
 
-      .inst-name { font-size: 23px; }
-      .title { margin: 9px 0 20px; font-size: 13px; }
+      .inst-name {
+        font-size: 23px;
+      }
+
+      .title {
+        margin: 9px 0 20px;
+        font-size: 13px;
+      }
 
       .form {
         grid-template-columns: 1fr;
@@ -233,7 +244,9 @@
 
       .password-box,
       .form > button,
-      #msg { grid-column: 1; }
+      #msg {
+        grid-column: 1;
+      }
 
       .form > input,
       .password-box input {
@@ -243,42 +256,106 @@
     }
 
     @media (max-width: 360px) {
-      .login-container { padding: 23px 15px 18px; }
-      .inst-name { font-size: 21px; }
+      .login-container {
+        padding: 23px 15px 18px;
+      }
+
+      .inst-name {
+        font-size: 21px;
+      }
     }
 
     @media (prefers-reduced-motion: reduce) {
-      *, *::before, *::after { transition: none !important; }
+      *,
+      *::before,
+      *::after {
+        transition: none !important;
+      }
     }
   </style>
 </head>
 
 <body>
+
   <main class="login-container">
-    <!-- Existing field IDs and function names are retained for login.js. -->
-    <img src="IMG_4060.jpeg" class="logo" alt="DAMS Trivandrum Logo">
+
+    <img
+      src="IMG_4060.jpeg"
+      class="logo"
+      alt="DAMS Trivandrum Logo"
+    >
 
     <h2 class="inst-name">DAMS TRIVANDRUM</h2>
-    <h3 class="title">NEET PG MOCK TEST SERIES Login</h3>
+
+    <h3 class="title">
+      NEET PG MOCK TEST SERIES Login
+    </h3>
 
     <div class="form">
-      <input type="text" id="fullName" placeholder="Full Name" autocomplete="name" aria-label="Full Name">
-      <input type="tel" id="phone" placeholder="Phone Number" autocomplete="tel" aria-label="Phone Number">
-      <input type="email" id="email" placeholder="Email" autocomplete="email" aria-label="Email">
-      <input type="text" id="cid" placeholder="Candidate ID" autocomplete="username" aria-label="Candidate ID">
+
+      <input
+        type="text"
+        id="fullName"
+        placeholder="Full Name"
+        autocomplete="name"
+        aria-label="Full Name"
+      >
+
+      <input
+        type="tel"
+        id="phone"
+        placeholder="Phone Number"
+        autocomplete="tel"
+        aria-label="Phone Number"
+      >
+
+      <input
+        type="email"
+        id="email"
+        placeholder="Email"
+        autocomplete="email"
+        aria-label="Email"
+      >
+
+      <input
+        type="text"
+        id="cid"
+        placeholder="Candidate ID"
+        autocomplete="username"
+        aria-label="Candidate ID"
+      >
 
       <div class="password-box">
-        <input type="password" id="pwd" placeholder="Password" autocomplete="current-password" aria-label="Password">
-        <button class="toggle" type="button" onclick="togglePassword()" aria-label="Show or hide password">◉</button>
+
+        <input
+          type="password"
+          id="pwd"
+          placeholder="Password"
+          autocomplete="current-password"
+          aria-label="Password"
+        >
+
+        <button
+          class="toggle"
+          type="button"
+          onclick="togglePassword()"
+          aria-label="Show or hide password"
+        >👁</button>
+
       </div>
 
-      <button type="button" onclick="login()">Login to CBT Portal</button>
+      <button type="button" onclick="login()">
+        Login to CBT Portal
+      </button>
+
       <p id="msg" role="status" aria-live="polite"></p>
+
     </div>
   </main>
 
-  <!-- Load configuration before login logic. -->
+  <!-- Load config first, then login logic -->
   <script src="config.js?v=20261108f"></script>
   <script src="login.js?v=20261108f"></script>
+
 </body>
 </html>
