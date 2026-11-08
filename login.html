@@ -5,7 +5,9 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="theme-color" content="#071a32">
+
   <title>DAMS TRIVANDRUM NEET PG MOCK TEST SERIES - Login</title>
+
   <link rel="stylesheet" href="style.css">
 
   <style>
@@ -19,14 +21,25 @@
       box-sizing: border-box;
     }
 
+    html,
+    body {
+      width: 100%;
+      min-height: 100%;
+      margin: 0;
+    }
+
     body {
       min-height: 100vh;
       min-height: 100svh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
+
+      display: flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+
       padding: 30px 18px;
+
       background-color: #10243d;
+
       background-image:
         linear-gradient(
           115deg,
@@ -35,76 +48,120 @@
           rgba(6, 18, 34, .62) 100%
         ),
         url("IMG_4057.jpeg");
+
       background-size: cover;
       background-position: center center;
       background-attachment: fixed;
     }
 
     .login-container {
-      width: min(520px, 100%);
-      margin: 0 auto;
+      width: min(520px, 100%) !important;
+      max-width: 520px !important;
+
+      margin: 0 auto !important;
+
+      float: none !important;
+      position: relative !important;
+      left: auto !important;
+      right: auto !important;
+      transform: none !important;
+
+      flex: 0 1 520px;
+
       padding: 30px clamp(22px, 4vw, 42px);
+
       border: 1px solid rgba(255,255,255,.78);
       border-radius: 22px;
+
       background: rgba(255,255,255,.97);
+
       box-shadow: 0 26px 75px rgba(0,0,0,.32);
+
       backdrop-filter: blur(12px);
       -webkit-backdrop-filter: blur(12px);
+
       text-align: left;
     }
 
+    /* DAMS Trivandrum Logo */
+
     .logo {
       display: block !important;
+
       width: min(100%, 310px);
       height: auto;
       max-height: 86px;
+
       object-fit: contain;
       object-position: left center;
+
       margin: 0 0 22px;
+
       border: 0;
       border-radius: 0;
       box-shadow: none;
+
       background: transparent;
     }
 
+    /* Candidate portal label */
+
     .login-container::before {
       content: "CANDIDATE PORTAL";
+
       display: block;
       width: max-content;
+
       margin: 0 0 15px;
       padding: 7px 11px;
+
       border-left: 3px solid var(--login-gold);
       border-radius: 3px;
+
       background: #f2f5f9;
       color: var(--login-blue);
+
       font-size: 10px;
       font-weight: 900;
       letter-spacing: .16em;
     }
 
+    /* Institution name */
+
     .inst-name {
       margin: 0;
+
       color: var(--login-navy);
+
       font-size: clamp(23px, 3vw, 30px);
       line-height: 1.18;
+
       letter-spacing: -.025em;
       font-weight: 900;
+
       text-align: left;
     }
 
     .title {
       margin: 10px 0 25px;
+
       color: #667085;
+
       font-size: 14px;
       line-height: 1.5;
       font-weight: 600;
+
       text-align: left;
     }
+
+    /* Login form */
 
     .form {
       display: grid;
       grid-template-columns: 1fr 1fr;
+
       gap: 13px;
+
       text-align: left;
     }
 
@@ -113,21 +170,31 @@
       width: 100%;
       min-width: 0;
       height: 49px;
+
       border: 1px solid #d5dce6;
       border-radius: 10px;
+
       padding: 0 13px;
+
       background: #fff;
       color: #172235;
+
       font: inherit;
       font-size: 14px;
+
       outline: none;
-      transition: border-color .18s ease, box-shadow .18s ease;
+
+      transition:
+        border-color .18s ease,
+        box-shadow .18s ease;
     }
 
     .form > input:focus,
     .password-box input:focus {
       border-color: var(--login-blue);
-      box-shadow: 0 0 0 3px rgba(23,74,124,.12);
+
+      box-shadow:
+        0 0 0 3px rgba(23,74,124,.12);
     }
 
     .form > input::placeholder,
@@ -135,9 +202,13 @@
       color: #98a2b3;
     }
 
+    /* Password field */
+
     .password-box {
       position: relative;
+
       grid-column: 1 / -1;
+
       width: 100%;
     }
 
@@ -147,84 +218,130 @@
 
     .toggle {
       position: absolute;
+
       top: 50%;
       right: 13px;
+
       transform: translateY(-50%);
+
       display: inline-flex;
       align-items: center;
       justify-content: center;
+
       width: 34px;
       height: 34px;
+
       border: 0;
       border-radius: 8px;
+
       background: transparent;
       color: #52657c;
+
       cursor: pointer;
       font-size: 19px;
     }
 
+    /* Login button */
+
     .form > button {
       grid-column: 1 / -1;
+
       width: 100%;
       min-height: 51px;
+
       margin-top: 4px;
+
       border: 0;
       border-radius: 10px;
-      background: linear-gradient(100deg, #0b2b50, #1a5285);
+
+      background:
+        linear-gradient(100deg, #0b2b50, #1a5285);
+
       color: #fff;
+
       font-size: 15px;
       font-weight: 850;
       letter-spacing: .02em;
+
       cursor: pointer;
-      box-shadow: 0 8px 18px rgba(13,49,85,.20);
-      transition: transform .18s ease, box-shadow .18s ease;
+
+      box-shadow:
+        0 8px 18px rgba(13,49,85,.20);
+
+      transition:
+        transform .18s ease,
+        box-shadow .18s ease;
     }
 
     .form > button:hover {
       transform: translateY(-1px);
-      box-shadow: 0 11px 22px rgba(13,49,85,.25);
+
+      box-shadow:
+        0 11px 22px rgba(13,49,85,.25);
     }
 
     #msg {
       grid-column: 1 / -1;
+
       min-height: 20px;
       margin: 0;
+
       text-align: center;
       font-size: 13px;
+
       overflow-wrap: anywhere;
     }
 
+    /* Footer */
+
     .login-container::after {
-      content: "DAMS TRIVANDRUM  •  NEET PG MOCK TEST SERIES";
+      content:
+        "DAMS TRIVANDRUM  •  NEET PG MOCK TEST SERIES";
+
       display: block;
+
       margin-top: 22px;
       padding-top: 15px;
+
       border-top: 1px solid #e8edf3;
+
       color: #7b8796;
+
       text-align: center;
+
       font-size: 10px;
       font-weight: 700;
       letter-spacing: .04em;
+
       line-height: 1.5;
     }
 
+    /* Mobile responsive design */
+
     @media (max-width: 760px) {
+
       body {
         padding: 18px 13px;
+
         background-attachment: scroll;
-        background-position: 58% center;
+        background-position: center center;
       }
 
       .login-container {
-        width: min(470px, 100%);
-        margin: 0 auto;
+        width: min(470px, 100%) !important;
+        max-width: 470px !important;
+
+        margin: 0 auto !important;
+
         padding: 25px 19px 21px;
+
         border-radius: 18px;
       }
 
       .logo {
         width: min(100%, 270px);
         max-height: 72px;
+
         margin-bottom: 18px;
       }
 
@@ -256,6 +373,7 @@
     }
 
     @media (max-width: 360px) {
+
       .login-container {
         padding: 23px 15px 18px;
       }
@@ -266,12 +384,14 @@
     }
 
     @media (prefers-reduced-motion: reduce) {
+
       *,
       *::before,
       *::after {
         transition: none !important;
       }
     }
+
   </style>
 </head>
 
@@ -279,17 +399,27 @@
 
   <main class="login-container">
 
+    <!-- DAMS Logo -->
+
     <img
       src="IMG_4060.jpeg"
       class="logo"
       alt="DAMS Trivandrum Logo"
     >
 
-    <h2 class="inst-name">DAMS TRIVANDRUM</h2>
+    <!-- Institution Name -->
+
+    <h2 class="inst-name">
+      DAMS TRIVANDRUM
+    </h2>
+
+    <!-- Exam Title -->
 
     <h3 class="title">
       NEET PG MOCK TEST SERIES Login
     </h3>
+
+    <!-- Login Form -->
 
     <div class="form">
 
@@ -344,18 +474,27 @@
 
       </div>
 
-      <button type="button" onclick="login()">
+      <button
+        type="button"
+        onclick="login()"
+      >
         Login to CBT Portal
       </button>
 
-      <p id="msg" role="status" aria-live="polite"></p>
+      <p
+        id="msg"
+        role="status"
+        aria-live="polite"
+      ></p>
 
     </div>
+
   </main>
 
   <!-- Load config first, then login logic -->
-  <script src="config.js?v=20261108f"></script>
-  <script src="login.js?v=20261108f"></script>
+
+  <script src="config.js?v=20261108g"></script>
+  <script src="login.js?v=20261108g"></script>
 
 </body>
 </html>
