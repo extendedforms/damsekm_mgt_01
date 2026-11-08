@@ -15,8 +15,8 @@ window.SCRIPT_URL = window.API_URL;
 // Backend controls actual scoring.
 // ==============================
 
-window.EXAM_DURATION_MIN = 180;
-window.EXAM_DURATION_SECONDS = 10800;
+window.EXAM_DURATION_MIN = 60;
+window.EXAM_DURATION_SECONDS = 3600;
 
 window.MARKS_CORRECT = 4;
 window.MARKS_WRONG = -1;
