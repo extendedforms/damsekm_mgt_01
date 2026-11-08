@@ -445,6 +445,12 @@ function render() {
   const q = Q[state.current];
   if (!q) return;
 
+  // These controls start disabled in exam.html while questions load.
+  // Enable them only after the server confirms a valid active attempt.
+  [clearBtn, markBtn, submitBtn].forEach(button => {
+    if (button) button.disabled = !attemptReady || submitted;
+  });
+
   if (qTitle) {
     qTitle.textContent = `Question ${state.current + 1} of ${totalQ}`;
   }
