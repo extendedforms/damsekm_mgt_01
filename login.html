@@ -3,44 +3,264 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>DAMS TVM-ZENITH HIGH NEET PG MOCK TEST SERIES - Login</title>
+  <meta name="theme-color" content="#071a32">
+  <title>DAMS TRIVANDRUM NEET PG MOCK TEST SERIES - Login</title>
   <link rel="stylesheet" href="style.css">
+
+  <!-- Login-page-only design overrides; other pages remain unchanged. -->
+  <style>
+    :root {
+      --login-navy: #0a2342;
+      --login-blue: #174a7c;
+      --login-gold: #d9ad62;
+    }
+
+    body {
+      min-height: 100vh;
+      min-height: 100svh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 30px 18px;
+      background-color: #10243d;
+      background-image:
+        linear-gradient(
+          115deg,
+          rgba(5, 18, 35, .78) 0%,
+          rgba(7, 25, 47, .57) 48%,
+          rgba(6, 18, 34, .70) 100%
+        ),
+        url("dams-trivandrum-bg.jpg");
+      background-size: cover;
+      background-position: center center;
+      background-attachment: fixed;
+    }
+
+    .login-container {
+      width: min(520px, 100%);
+      margin: 0 0 0 auto;
+      padding: 34px clamp(22px, 4vw, 42px);
+      border: 1px solid rgba(255,255,255,.72);
+      border-radius: 22px;
+      background: rgba(255,255,255,.96);
+      box-shadow: 0 26px 75px rgba(0,0,0,.32);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      text-align: left;
+    }
+
+    /* Use a simple premium brand marker instead of the old broken logo. */
+    .logo { display: none !important; }
+
+    .login-container::before {
+      content: "CANDIDATE PORTAL";
+      display: block;
+      width: max-content;
+      margin: 0 0 18px;
+      padding: 7px 11px;
+      border-left: 3px solid var(--login-gold);
+      border-radius: 3px;
+      background: #f2f5f9;
+      color: var(--login-blue);
+      font-size: 10px;
+      font-weight: 900;
+      letter-spacing: .16em;
+    }
+
+    .inst-name {
+      margin: 0;
+      color: var(--login-navy);
+      font-size: clamp(23px, 3vw, 30px);
+      line-height: 1.18;
+      letter-spacing: -.025em;
+      font-weight: 900;
+      text-align: left;
+    }
+
+    .title {
+      margin: 10px 0 25px;
+      color: #667085;
+      font-size: 14px;
+      line-height: 1.5;
+      font-weight: 600;
+      text-align: left;
+    }
+
+    .form {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 13px;
+      text-align: left;
+    }
+
+    .form > input,
+    .password-box input {
+      width: 100%;
+      min-width: 0;
+      height: 49px;
+      border: 1px solid #d5dce6;
+      border-radius: 10px;
+      padding: 0 13px;
+      background: #fff;
+      color: #172235;
+      font: inherit;
+      font-size: 14px;
+      outline: none;
+      transition: border-color .18s ease, box-shadow .18s ease;
+    }
+
+    .form > input:focus,
+    .password-box input:focus {
+      border-color: var(--login-blue);
+      box-shadow: 0 0 0 3px rgba(23,74,124,.12);
+    }
+
+    .form > input::placeholder,
+    .password-box input::placeholder {
+      color: #98a2b3;
+    }
+
+    .password-box {
+      position: relative;
+      grid-column: 1 / -1;
+      width: 100%;
+    }
+
+    .password-box input { padding-right: 50px; }
+
+    .toggle {
+      position: absolute;
+      top: 50%;
+      right: 13px;
+      transform: translateY(-50%);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 34px;
+      height: 34px;
+      border: 0;
+      border-radius: 8px;
+      background: transparent;
+      color: #52657c;
+      cursor: pointer;
+      font-size: 19px;
+    }
+
+    .form > button {
+      grid-column: 1 / -1;
+      width: 100%;
+      min-height: 51px;
+      margin-top: 4px;
+      border: 0;
+      border-radius: 10px;
+      background: linear-gradient(100deg, #0b2b50, #1a5285);
+      color: #fff;
+      font-size: 15px;
+      font-weight: 850;
+      letter-spacing: .02em;
+      cursor: pointer;
+      box-shadow: 0 8px 18px rgba(13,49,85,.20);
+      transition: transform .18s ease, box-shadow .18s ease;
+    }
+
+    .form > button:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 11px 22px rgba(13,49,85,.25);
+    }
+
+    #msg {
+      grid-column: 1 / -1;
+      min-height: 20px;
+      margin: 0;
+      text-align: center;
+      font-size: 13px;
+      overflow-wrap: anywhere;
+    }
+
+    .login-container::after {
+      content: "ZENITH HIGH & DAMS TRIVANDRUM  •  NEET PG MOCK TEST SERIES";
+      display: block;
+      margin-top: 22px;
+      padding-top: 15px;
+      border-top: 1px solid #e8edf3;
+      color: #7b8796;
+      text-align: center;
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: .04em;
+      line-height: 1.5;
+    }
+
+    @media (max-width: 760px) {
+      body {
+        padding: 18px 13px;
+        background-attachment: scroll;
+        background-position: 58% center;
+      }
+
+      .login-container {
+        width: min(470px, 100%);
+        margin: 0 auto;
+        padding: 26px 19px 21px;
+        border-radius: 18px;
+      }
+
+      .inst-name { font-size: 23px; }
+      .title { margin: 9px 0 20px; font-size: 13px; }
+
+      .form {
+        grid-template-columns: 1fr;
+        gap: 11px;
+      }
+
+      .password-box,
+      .form > button,
+      #msg { grid-column: 1; }
+
+      .form > input,
+      .password-box input {
+        height: 48px;
+        font-size: 16px;
+      }
+    }
+
+    @media (max-width: 360px) {
+      .login-container { padding: 23px 15px 18px; }
+      .inst-name { font-size: 21px; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { transition: none !important; }
+    }
+  </style>
 </head>
 
 <body>
-
-  <div class="login-container">
-
-    <!-- Logo -->
+  <main class="login-container">
+    <!-- Existing field IDs and function names are retained for login.js. -->
     <img src="IMG_3984.jpeg" class="logo" alt="Institution Logo">
 
-    <!-- Institution Name -->
-    <h2 class="inst-name">ZENITH HIGH & DAMS TRIVANDRUM</h2>
-
-    <!-- Title -->
+    <h2 class="inst-name">ZENITH HIGH &amp; DAMS TRIVANDRUM</h2>
     <h3 class="title">NEET PG MOCK TEST SERIES Login</h3>
 
-    <!-- Form -->
     <div class="form">
-      <input type="text" id="fullName" placeholder="Full Name" autocomplete="name">
-      <input type="tel" id="phone" placeholder="Phone Number" autocomplete="tel">
-      <input type="email" id="email" placeholder="Email" autocomplete="email">
-      <input type="text" id="cid" placeholder="Candidate ID" autocomplete="username">
+      <input type="text" id="fullName" placeholder="Full Name" autocomplete="name" aria-label="Full Name">
+      <input type="tel" id="phone" placeholder="Phone Number" autocomplete="tel" aria-label="Phone Number">
+      <input type="email" id="email" placeholder="Email" autocomplete="email" aria-label="Email">
+      <input type="text" id="cid" placeholder="Candidate ID" autocomplete="username" aria-label="Candidate ID">
 
       <div class="password-box">
-        <input type="password" id="pwd" placeholder="Password" autocomplete="current-password">
-        <span class="toggle" onclick="togglePassword()">👁</span>
+        <input type="password" id="pwd" placeholder="Password" autocomplete="current-password" aria-label="Password">
+        <button class="toggle" type="button" onclick="togglePassword()" aria-label="Show or hide password">◉</button>
       </div>
 
-      <button type="button" onclick="login()">Login</button>
-
-      <p id="msg"></p>
+      <button type="button" onclick="login()">Login to CBT Portal</button>
+      <p id="msg" role="status" aria-live="polite"></p>
     </div>
-  </div>
+  </main>
 
-  <!-- ✅ Load config first, then login logic -->
-  <script src="config.js"></script>
-  <script src="login.js"></script>
-
+  <!-- Load configuration before login logic. -->
+  <script src="config.js?v=20261108d"></script>
+  <script src="login.js?v=20261108d"></script>
 </body>
 </html>
