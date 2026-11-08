@@ -26,11 +26,11 @@
       background-image:
         linear-gradient(
           115deg,
-          rgba(5, 18, 35, .78) 0%,
-          rgba(7, 25, 47, .57) 48%,
-          rgba(6, 18, 34, .70) 100%
+          rgba(5, 18, 35, .72) 0%,
+          rgba(7, 25, 47, .48) 48%,
+          rgba(6, 18, 34, .62) 100%
         ),
-        url("dams-trivandrum-bg.jpg");
+        url("IMG_4057.jpeg");
       background-size: cover;
       background-position: center center;
       background-attachment: fixed;
@@ -39,24 +39,36 @@
     .login-container {
       width: min(520px, 100%);
       margin: 0 0 0 auto;
-      padding: 34px clamp(22px, 4vw, 42px);
-      border: 1px solid rgba(255,255,255,.72);
+      padding: 30px clamp(22px, 4vw, 42px);
+      border: 1px solid rgba(255,255,255,.78);
       border-radius: 22px;
-      background: rgba(255,255,255,.96);
+      background: rgba(255,255,255,.97);
       box-shadow: 0 26px 75px rgba(0,0,0,.32);
       backdrop-filter: blur(12px);
       -webkit-backdrop-filter: blur(12px);
       text-align: left;
     }
 
-    /* Use a simple premium brand marker instead of the old broken logo. */
-    .logo { display: none !important; }
+    /* DAMS Trivandrum logo supplied by the user. */
+    .logo {
+      display: block !important;
+      width: min(100%, 310px);
+      height: auto;
+      max-height: 86px;
+      object-fit: contain;
+      object-position: left center;
+      margin: 0 0 22px;
+      border: 0;
+      border-radius: 0;
+      box-shadow: none;
+      background: transparent;
+    }
 
     .login-container::before {
       content: "CANDIDATE PORTAL";
       display: block;
       width: max-content;
-      margin: 0 0 18px;
+      margin: 0 0 15px;
       padding: 7px 11px;
       border-left: 3px solid var(--login-gold);
       border-radius: 3px;
@@ -201,8 +213,14 @@
       .login-container {
         width: min(470px, 100%);
         margin: 0 auto;
-        padding: 26px 19px 21px;
+        padding: 25px 19px 21px;
         border-radius: 18px;
+      }
+
+      .logo {
+        width: min(100%, 270px);
+        max-height: 72px;
+        margin-bottom: 18px;
       }
 
       .inst-name { font-size: 23px; }
@@ -238,7 +256,7 @@
 <body>
   <main class="login-container">
     <!-- Existing field IDs and function names are retained for login.js. -->
-    <img src="IMG_4060.jpeg" class="logo" alt="Institution Logo">
+    <img src="IMG_4060.jpeg" class="logo" alt="DAMS Trivandrum Logo">
 
     <h2 class="inst-name">ZENITH HIGH &amp; DAMS TRIVANDRUM</h2>
     <h3 class="title">NEET PG MOCK TEST SERIES Login</h3>
@@ -260,7 +278,7 @@
   </main>
 
   <!-- Load configuration before login logic. -->
-  <script src="config.js?v=20261108d"></script>
-  <script src="login.js?v=20261108d"></script>
+  <script src="config.js?v=20261108e"></script>
+  <script src="login.js?v=20261108e"></script>
 </body>
 </html>
