@@ -1,12 +1,17 @@
-
 /***********************
  * exam.js - SECURE SERVER-SCORED VERSION
  *
- * Preserves the existing CBT UI element IDs, palette, image zoom,
- * local answer save, IST display and client-side violation detection.
- * Questions/options are fetched from Apps Script. No answer key or
- * client-side scoring is present in this file.
+ * Fixes:
+ * 1. Avoid selecting options when the candidate is scrolling.
+ * 2. Scroll to the question automatically after Next / Previous / palette navigation.
+ * 3. Deduplicate blur + visibility events and keep the server violation count authoritative.
+ * 4. Preload the next question image and decode images asynchronously.
+ *
+ * Questions/options are fetched from Apps Script.
+ * No answer key or client-side scoring is present in this file.
  ***********************/
+
+'use strict';
 
 function safeParse(s) {
   try {
@@ -37,6 +42,9 @@ let serverStartedAtMs = 0;
 let serverClockOffsetMs = 0;
 let attemptReady = false;
 let suppressVioUntil = 0;
+let lastViolationAt = 0;
+let authoritativeViolationCount = 0;
+let timerIntervalId = null;
 
 function suppressViolations(ms = 2500) {
   suppressVioUntil = Date.now() + ms;
@@ -150,8 +158,12 @@ function defaultState() {
 }
 
 function save() {
-  if (state) {
+  if (!state) return;
+
+  try {
     localStorage.setItem(KEY, JSON.stringify(state));
+  } catch (e) {
+    console.warn('Could not save exam state locally:', e);
   }
 }
 
@@ -159,7 +171,7 @@ function pad2(n) {
   return String(n).padStart(2, '0');
 }
 
-async function postAPI(payload) {
+async function postAPI(payload, options = {}) {
   const API_URL = window.API_URL || window.EXAM_API_URL || '';
 
   if (!API_URL) {
@@ -167,10 +179,11 @@ async function postAPI(payload) {
   }
 
   const ctrl = new AbortController();
-  const timer = setTimeout(() => ctrl.abort(), 20000);
+  const timeoutMs = Number(options.timeoutMs) || 30000;
+  const timer = setTimeout(() => ctrl.abort(), timeoutMs);
 
   try {
-    const res = await fetch(API_URL, {
+    const fetchOptions = {
       method: 'POST',
       headers: {
         'Content-Type': 'text/plain;charset=utf-8'
@@ -178,8 +191,14 @@ async function postAPI(payload) {
       body: JSON.stringify(payload),
       cache: 'no-store',
       signal: ctrl.signal
-    });
+    };
 
+    // Useful for small violation reports during page/app transitions.
+    if (options.keepalive === true) {
+      fetchOptions.keepalive = true;
+    }
+
+    const res = await fetch(API_URL, fetchOptions);
     const txt = await res.text();
 
     let data;
@@ -200,6 +219,11 @@ async function postAPI(payload) {
 
     return data;
 
+  } catch (err) {
+    if (err && err.name === 'AbortError') {
+      throw new Error('The server took too long to respond. Check your internet connection and retry.');
+    }
+    throw err;
   } finally {
     clearTimeout(timer);
   }
@@ -237,9 +261,7 @@ function loadLocalState() {
 
   loaded.startedAt = serverStartedAtMs;
 
-  // Keep only this server-issued attempt's question IDs
-  // and valid option IDs.
-
+  // Keep only this server-issued attempt's question IDs and valid option IDs.
   const allowedIds = new Set(Q.map(q => String(q.id)));
 
   Object.keys(loaded.answers).forEach(id => {
@@ -283,6 +305,40 @@ function palClass(qid) {
   return 'pbtn ansreview';
 }
 
+function scrollToQuestionTop() {
+  if (!qTitle) return;
+
+  requestAnimationFrame(() => {
+    const topbar = document.querySelector('.topbar');
+    const stickyOffset = topbar
+      ? topbar.getBoundingClientRect().height
+      : 0;
+
+    const targetY =
+      window.scrollY +
+      qTitle.getBoundingClientRect().top -
+      stickyOffset -
+      12;
+
+    window.scrollTo({
+      top: Math.max(0, targetY),
+      behavior: 'smooth'
+    });
+  });
+}
+
+function preloadNextQuestionImage() {
+  if (!state || !Q.length) return;
+
+  const next = Q[state.current + 1];
+  if (!next || !next.image) return;
+
+  // Only preload the next image, rather than downloading every image at once.
+  const preloader = new Image();
+  preloader.decoding = 'async';
+  preloader.src = next.image;
+}
+
 function renderPalette() {
   if (!pal || !state) return;
 
@@ -300,6 +356,7 @@ function renderPalette() {
       state.current = idx;
       save();
       render();
+      scrollToQuestionTop();
     });
 
     pal.appendChild(b);
@@ -309,6 +366,7 @@ function renderPalette() {
 function openImgModal(src) {
   if (!imgModal || !imgModalPic) return;
 
+  suppressViolations(1500);
   imgModalPic.src = src;
   imgModal.classList.add('show');
   imgModal.setAttribute('aria-hidden', 'false');
@@ -361,21 +419,22 @@ function setAnswer(qid, optionId) {
   if (!state) return;
 
   state.answers[qid] = String(optionId).toUpperCase();
-
   save();
   renderPalette();
 }
 
 function clearAnswer(qid) {
-  delete state.answers[qid];
+  if (!state) return;
 
+  delete state.answers[qid];
   save();
   renderPalette();
 }
 
 function toggleMark(qid) {
-  state.marked[qid] = !state.marked[qid];
+  if (!state) return;
 
+  state.marked[qid] = !state.marked[qid];
   save();
   renderPalette();
 }
@@ -384,7 +443,6 @@ function render() {
   if (!state) return;
 
   const q = Q[state.current];
-
   if (!q) return;
 
   if (qTitle) {
@@ -404,8 +462,16 @@ function render() {
       img.src = q.image;
       img.alt = 'Question image';
       img.title = 'Tap to zoom';
+      img.loading = 'eager';
+      img.decoding = 'async';
+      img.fetchPriority = 'high';
 
       img.addEventListener('click', () => openImgModal(q.image));
+
+      img.addEventListener('error', () => {
+        console.warn('Question image failed to load:', q.image);
+        img.alt = 'Question image could not be loaded';
+      }, { once: true });
 
       qImgWrap.appendChild(img);
     }
@@ -419,42 +485,38 @@ function render() {
     (q.options || []).forEach(option => {
       const row = document.createElement('label');
       row.className = 'opt';
+      row.classList.toggle('selected', picked === option.id);
 
       const radio = document.createElement('input');
-
       radio.type = 'radio';
       radio.name = 'opt';
       radio.value = option.id;
       radio.checked = (picked === option.id);
+      radio.setAttribute('aria-label', option.text || `Option ${option.id}`);
 
       const span = document.createElement('span');
-
       span.className = 'optText';
       span.textContent = option.text;
 
-      const choose = e => {
-        e.preventDefault();
-        radio.checked = true;
-        setAnswer(q.id, option.id);
-      };
-
-      row.addEventListener('pointerdown', choose, {
-        passive: false
-      });
-
-      row.addEventListener('touchstart', choose, {
-        passive: false
-      });
-
-      row.addEventListener('click', () => {
-        if (state.answers[q.id] !== option.id) {
+      // IMPORTANT:
+      // Do not select on touchstart, pointerdown or generic row click.
+      // Those events also occur while a candidate is scrolling.
+      // Native radio change fires only when the control is actually selected.
+      radio.addEventListener('change', () => {
+        if (radio.checked) {
           setAnswer(q.id, option.id);
+
+          // Update visual selection without rebuilding the radio while
+          // the browser is completing its native touch interaction.
+          opts.querySelectorAll('.opt').forEach(el => {
+            el.classList.remove('selected');
+          });
+          row.classList.add('selected');
         }
       });
 
       row.appendChild(radio);
       row.appendChild(span);
-
       opts.appendChild(row);
     });
   }
@@ -478,6 +540,7 @@ function render() {
   }
 
   renderPalette();
+  preloadNextQuestionImage();
 }
 
 if (prevBtn) {
@@ -486,6 +549,7 @@ if (prevBtn) {
       state.current--;
       save();
       render();
+      scrollToQuestionTop();
     }
   });
 }
@@ -496,6 +560,7 @@ if (nextBtn) {
       state.current++;
       save();
       render();
+      scrollToQuestionTop();
     }
   });
 }
@@ -531,7 +596,7 @@ if (submitBtn) {
 }
 
 async function postViolation(type, details = '') {
-  if (!attemptReady) return;
+  if (!attemptReady || !state) return;
 
   try {
     const data = await postAPI({
@@ -540,10 +605,18 @@ async function postViolation(type, details = '') {
       candidateId: cand.candidateId || cand.id || '',
       type,
       details
-    });
+    }, { timeoutMs: 12000, keepalive: true });
 
     if (Number.isFinite(Number(data.violationCount))) {
-      state.violations = Number(data.violationCount);
+      authoritativeViolationCount = Math.max(
+        authoritativeViolationCount,
+        Number(data.violationCount)
+      );
+
+      state.violations = Math.max(
+        Number(state.violations) || 0,
+        authoritativeViolationCount
+      );
     }
 
     save();
@@ -558,9 +631,18 @@ async function postViolation(type, details = '') {
 }
 
 function addViolation(reason) {
-  if (!canCountViolation() || !state || !attemptReady) return;
+  if (!canCountViolation() || !state || !attemptReady || submitted) return;
 
-  state.violations = (state.violations || 0) + 1;
+  // A single app/tab switch may emit both visibilitychange and blur.
+  // Treat events within this short interval as the same incident.
+  const now = Date.now();
+  if (now - lastViolationAt < 2000) return;
+  lastViolationAt = now;
+
+  state.violations = Math.max(
+    Number(state.violations) || 0,
+    authoritativeViolationCount
+  ) + 1;
 
   save();
 
@@ -589,7 +671,9 @@ document.addEventListener('visibilitychange', () => {
 });
 
 window.addEventListener('blur', () => {
-  if (!IS_IOS) {
+  // iOS app switching is more consistently detected through visibilitychange.
+  // On desktop, count focus loss only if the page is still visible.
+  if (!IS_IOS && document.visibilityState === 'visible') {
     addViolation('WINDOW_BLUR');
   }
 });
@@ -626,7 +710,6 @@ async function submitExam(isAuto = false, reason = 'SUBMIT') {
 
   try {
     // Only selected option IDs and review markers leave the browser.
-
     const data = await postAPI({
       action: 'submit',
       token: cand.token,
@@ -636,7 +719,7 @@ async function submitExam(isAuto = false, reason = 'SUBMIT') {
       reason,
       isAuto: !!isAuto,
       userAgent: navigator.userAgent || ''
-    });
+    }, { timeoutMs: 30000 });
 
     const result = {
       name: data.name || cand.name || '',
@@ -691,17 +774,19 @@ async function submitExam(isAuto = false, reason = 'SUBMIT') {
 }
 
 async function init() {
+  if (qTitle) qTitle.textContent = 'Loading questionsâ¦';
+  if (qText) qText.textContent = 'Please wait. Your examination is being prepared.';
+
   try {
     const data = await postAPI({
       action: 'startExam',
       token: cand.token,
       candidateId: cand.candidateId || cand.id || ''
-    });
+    }, { timeoutMs: 45000 });
 
     if (data.alreadySubmitted) {
       localStorage.setItem('neet_submitted', 'yes');
       localStorage.setItem('neet_result', JSON.stringify(data));
-
       location.replace('result.html');
       return;
     }
@@ -733,15 +818,19 @@ async function init() {
       );
     }
 
+    authoritativeViolationCount = Math.max(
+      0,
+      Number(data.violationCount) || 0
+    );
+
     loadLocalState();
 
     state.violations = Math.max(
       Number(state.violations) || 0,
-      Number(data.violationCount) || 0
+      authoritativeViolationCount
     );
 
     attemptReady = true;
-
     save();
 
     if (!inExamWindowDisplayOnly()) {
@@ -752,25 +841,30 @@ async function init() {
 
     updateTimer();
 
-    setInterval(updateTimer, 1000);
+    if (timerIntervalId) clearInterval(timerIntervalId);
+    timerIntervalId = setInterval(updateTimer, 1000);
 
     render();
 
   } catch (err) {
-    alert(
-      'Unable to start examination: ' +
-      (err && err.message ? err.message : err)
-    );
+    console.error('Exam initialization failed:', err);
 
-    if (submitBtn) {
-      submitBtn.disabled = true;
+    if (qTitle) qTitle.textContent = 'Unable to load examination';
+    if (qText) {
+      qText.textContent =
+        (err && err.message ? err.message : 'Please refresh or contact the administrator.');
     }
+
+    if (submitBtn) submitBtn.disabled = true;
+    if (prevBtn) prevBtn.disabled = true;
+    if (nextBtn) nextBtn.disabled = true;
+    if (clearBtn) clearBtn.disabled = true;
+    if (markBtn) markBtn.disabled = true;
   }
 }
 
 function inExamWindowDisplayOnly() {
   // Informational only. Apps Script enforces the real schedule.
-
   if (typeof window.isWithinExamWindow !== 'function') {
     return true;
   }
