@@ -1,289 +1,192 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="theme-color" content="#071a32">
-  <title>Result - DAMS Trivandrum Mock Test Series</title>
-  <link rel="stylesheet" href="style.css">
-
-  <style>
-    * { box-sizing: border-box; }
-    html, body { margin: 0; min-height: 100%; }
-    body.result-page {
-      min-height: 100vh;
-      min-height: 100svh;
-      padding: 12px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background: #f2f5f9;
-      color: #26364d;
-      font-family: Arial, sans-serif;
-    }
-    .result-container {
-      width: min(1180px, 100%);
-      margin: auto;
-      padding: clamp(14px, 2.2vh, 24px);
-      border-radius: 20px;
-      background: rgba(255,255,255,.97);
-      box-shadow: 0 12px 38px rgba(15,35,60,.12);
-    }
-    .brand-heading {
-      margin: 0 0 3px;
-      color: #173d68;
-      text-align: center;
-      font-size: clamp(17px, 2.3vw, 27px);
-      line-height: 1.15;
-      font-weight: 900;
-      letter-spacing: .07em;
-    }
-    .result-heading {
-      margin: 0 0 12px;
-      color: #102b4c;
-      text-align: center;
-      font-size: clamp(25px, 3vw, 36px);
-      line-height: 1.1;
-      font-weight: 900;
-    }
-    .candidate-card {
-      display: grid;
-      grid-template-columns: repeat(4, minmax(0, 1fr));
-      gap: 8px 14px;
-      padding: 12px 14px;
-      margin-bottom: 10px;
-      border: 1px solid #e1e7ef;
-      border-radius: 13px;
-      background: #fff;
-    }
-    .candidate-line {
-      min-width: 0;
-      overflow-wrap: anywhere;
-      font-size: clamp(12px, 1.2vw, 15px);
-      line-height: 1.35;
-    }
-    .candidate-line strong { color: #34445b; }
-    .stats-grid {
-      display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: 9px;
-    }
-    .stat-card {
-      min-width: 0;
-      padding: 10px 13px;
-      border: 1px solid #e1e7ef;
-      border-radius: 13px;
-      background: #fff;
-    }
-    .stat-label {
-      color: #526176;
-      font-size: 13px;
-      font-weight: 750;
-    }
-    .stat-value {
-      margin-top: 2px;
-      color: #142f50;
-      font-size: clamp(21px, 2.6vw, 31px);
-      line-height: 1.1;
-      font-weight: 900;
-      overflow-wrap: anywhere;
-    }
-    .result-actions {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      flex-wrap: wrap;
-      gap: 10px;
-      margin-top: 12px;
-    }
-    .result-btn {
-      min-width: 145px;
-      min-height: 42px;
-      padding: 9px 18px;
-      border: 0;
-      border-radius: 10px;
-      font-weight: 800;
-      font-size: 14px;
-      cursor: pointer;
-    }
-    .result-btn.primary { color: #fff; background: #173f6c; }
-    .result-btn.secondary { color: #173f6c; background: #eaf0f6; }
-    .result-note {
-      min-height: 17px;
-      margin-top: 7px;
-      text-align: center;
-      color: #66758a;
-      font-size: 12px;
-      overflow-wrap: anywhere;
-    }
-    @media (max-width: 700px) {
-      body.result-page { padding: 8px; align-items: flex-start; }
-      .result-container { padding: 13px; border-radius: 15px; }
-      .candidate-card { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
-      .stats-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 7px; }
-      .stat-card { padding: 9px 10px; }
-      .stat-label { font-size: 12px; }
-      .result-btn { min-width: 125px; }
-    }
-    @media (max-height: 650px) and (min-width: 701px) {
-      body.result-page { padding: 6px; }
-      .result-container { padding: 10px 14px; }
-      .candidate-card { padding: 8px 12px; margin-bottom: 7px; }
-      .stats-grid { gap: 6px; }
-      .stat-card { padding: 7px 11px; }
-      .result-actions { margin-top: 7px; }
-      .result-btn { min-height: 36px; }
-    }
-  </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Result - ZENITH HIGH CBT</title>
+  <link rel="stylesheet" href="style.css" />
 </head>
-
 <body class="result-page">
-  <main class="result-container">
-    <h1 class="brand-heading">DAMS TRIVANDRUM MOCK TEST SERIES</h1>
-    <h2 class="result-heading">Result</h2>
-
-    <section class="candidate-card" aria-label="Candidate details">
+  <div class="result-container">
+    <h1 class="result-heading">Result</h1>
+    <div class="candidate-card">
       <div class="candidate-line"><strong>Name:</strong> <span id="candName">-</span></div>
       <div class="candidate-line"><strong>Candidate ID:</strong> <span id="candId">-</span></div>
       <div class="candidate-line"><strong>Email:</strong> <span id="candEmail">-</span></div>
       <div class="candidate-line"><strong>Phone:</strong> <span id="candPhone">-</span></div>
-    </section>
-
-    <section class="stats-grid" aria-label="Examination result">
-      <div class="stat-card"><div class="stat-label">Score</div><div class="stat-value" id="score">-</div></div>
-      <div class="stat-card"><div class="stat-label">Correct</div><div class="stat-value" id="correct">-</div></div>
-      <div class="stat-card"><div class="stat-label">Wrong</div><div class="stat-value" id="wrong">-</div></div>
-      <div class="stat-card"><div class="stat-label">Unattempted</div><div class="stat-value" id="unattempted">-</div></div>
-      <div class="stat-card"><div class="stat-label">Time Taken</div><div class="stat-value" id="timeTaken">-</div></div>
-      <div class="stat-card"><div class="stat-label">Violations</div><div class="stat-value" id="violations">0</div></div>
-    </section>
-
-    <div class="result-actions">
-      <button class="result-btn primary" type="button" onclick="backToLogin()">Logout</button>
-      <button class="result-btn secondary" type="button" onclick="backToLogin()">Back to Login</button>
     </div>
-    <div class="result-note" id="statusNote" role="status" aria-live="polite">Loading saved resultâ¦</div>
-  </main>
-
-  <script src="config.js?v=20261109a"></script>
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-label">Score</div>
+        <div class="stat-value" id="score">-</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Correct</div>
+        <div class="stat-value" id="correct">-</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Wrong</div>
+        <div class="stat-value" id="wrong">-</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Unattempted</div>
+        <div class="stat-value" id="unattempted">-</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Time Taken</div>
+        <div class="stat-value" id="timeTaken">-</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Violations</div>
+        <div class="stat-value" id="violations">-</div>
+      </div>
+    </div>
+    <div class="result-actions">
+      <button class="result-btn primary" onclick="backToLogin()">Logout</button>
+      <button class="result-btn secondary" onclick="backToLogin()">Back to Login</button>
+    </div>
+    <div class="result-note" id="statusNote"></div>
+  </div>
   <script>
-    'use strict';
-
     function safeParse(value) {
-      try { return JSON.parse(value); } catch (e) { return null; }
+      try {
+        return JSON.parse(value);
+      } catch {
+        return null;
+      }
     }
-
     function firstDefined() {
       for (let i = 0; i < arguments.length; i++) {
         const value = arguments[i];
-        if (value !== undefined && value !== null && value !== '') return value;
+        if (value !== undefined && value !== null && value !== "") {
+          return value;
+        }
       }
       return null;
     }
-
-    function setText(id, value, fallback = '-') {
-      const el = document.getElementById(id);
-      if (el) el.textContent = value !== undefined && value !== null && value !== '' ? String(value) : fallback;
+    function byPath(obj, path) {
+      if (!obj || !path) return undefined;
+      return path.split(".").reduce(function(acc, key) {
+        return acc && acc[key] !== undefined ? acc[key] : undefined;
+      }, obj);
     }
-
-    function formatTime(value) {
-      const sec = Number(value);
-      if (!Number.isFinite(sec) || sec < 0) return '-';
+    function setText(id, value, fallback) {
+      document.getElementById(id).textContent =
+        value !== undefined && value !== null && value !== "" ? value : fallback;
+    }
+    function formatTime(seconds) {
+      const sec = Number(seconds);
+      if (!Number.isFinite(sec) || sec < 0) return "-";
       const h = Math.floor(sec / 3600);
       const m = Math.floor((sec % 3600) / 60);
       const s = sec % 60;
-      if (h) return `${h} hr ${m} min ${s} sec`;
-      if (m) return `${m} min ${s} sec`;
-      return `${s} sec`;
-    }
-
-    function renderResult(result, candidate) {
-      result = result || {};
-      candidate = candidate || {};
-
-      setText('candName', firstDefined(result.name, candidate.name));
-      setText('candId', firstDefined(result.candidateId, candidate.candidateId, candidate.id));
-      setText('candEmail', firstDefined(result.email, candidate.email));
-      setText('candPhone', firstDefined(result.phone, candidate.phone));
-
-      setText('score', firstDefined(result.score, result.marks, result.totalScore));
-      setText('correct', firstDefined(result.correct, result.correctCount));
-      setText('wrong', firstDefined(result.wrong, result.wrongCount));
-      setText('unattempted', firstDefined(result.unattempted, result.unanswered));
-      setText('timeTaken', formatTime(firstDefined(result.timeTakenSec, result.timeTaken)));
-      setText('violations', firstDefined(result.violations, result.violationCount), '0');
-
-      const note = document.getElementById('statusNote');
-      if (note) {
-        note.textContent = (result.status === 'success' || result.ok === true || result.score !== undefined)
-          ? 'Exam result loaded successfully.'
-          : (result.message || 'Showing the saved result available in this browser.');
+      if (h > 0) {
+        return h + " hr " + m + " min " + s + " sec";
       }
-    }
-
-    async function fetchAuthoritativeResult(candidate) {
-      const token = candidate && candidate.token;
-      if (!token || !window.API_URL) return;
-
-      const response = await fetch(window.API_URL, {
-        method: 'POST',
-        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-        body: JSON.stringify({
-          action: 'getResult',
-          token: token,
-          candidateId: candidate.candidateId || candidate.id || ''
-        }),
-        cache: 'no-store'
-      });
-
-      const data = await response.json();
-      if (!response.ok || data.ok === false) {
-        throw new Error(data.error || 'Could not retrieve the saved result from the server.');
+      if (m > 0) {
+        return m + " min " + s + " sec";
       }
-
-      localStorage.setItem('neet_result', JSON.stringify(data));
-      renderResult(data, candidate);
+      return s + " sec";
     }
-
-    const candidate = safeParse(localStorage.getItem('neet_candidate') || '') || {};
-    const savedResult = safeParse(localStorage.getItem('neet_result') || '') || {};
-
-    // Render local submitted data immediately; then refresh it from Results sheet.
-    renderResult(savedResult, candidate);
-
-    if (candidate.token) {
-      fetchAuthoritativeResult(candidate).catch(error => {
-        console.warn('Server result refresh failed:', error);
-        const note = document.getElementById('statusNote');
-        if (note && !savedResult.score && savedResult.score !== 0) {
-          note.textContent = 'Saved result could not be refreshed: ' + error.message;
-        }
-      });
-    } else if (savedResult.score === undefined && savedResult.score !== 0) {
-      const note = document.getElementById('statusNote');
-      if (note) note.textContent = 'No saved result or active login token was found. Please log in again and contact the administrator to retrieve the submitted result.';
+    const candidate = safeParse(localStorage.getItem("neet_candidate") || "") || {};
+    const result = safeParse(localStorage.getItem("neet_result") || "") || {};
+    if (!candidate || !candidate.candidateId) {
+      window.location.replace("login.html?v=" + Date.now());
     }
-
-    function backToLogin() {
-      localStorage.removeItem('neet_candidate');
-      localStorage.removeItem('neet_submitted');
-      localStorage.removeItem('neet_result');
-      localStorage.removeItem('neet_pending_submission');
-      localStorage.removeItem('candidateId');
-      localStorage.removeItem('token');
-      localStorage.removeItem('candidateName');
-      localStorage.removeItem('candidatePhone');
-      localStorage.removeItem('candidateEmail');
-
-      const removeKeys = [];
+    setText("candName", candidate.name || "-", "-");
+    setText("candId", candidate.candidateId || "-", "-");
+    setText("candEmail", candidate.email || "-", "-");
+    setText("candPhone", candidate.phone || "-", "-");
+    const score = firstDefined(
+      result.score,
+      result.marks,
+      result.totalScore,
+      byPath(result, "data.score"),
+      byPath(result, "data.marks"),
+      byPath(result, "result.score"),
+      byPath(result, "summary.score")
+    );
+    const correct = firstDefined(
+      result.correct,
+      result.correctCount,
+      byPath(result, "data.correct"),
+      byPath(result, "data.correctCount"),
+      byPath(result, "result.correct"),
+      byPath(result, "summary.correct")
+    );
+    const wrong = firstDefined(
+      result.wrong,
+      result.wrongCount,
+      byPath(result, "data.wrong"),
+      byPath(result, "data.wrongCount"),
+      byPath(result, "result.wrong"),
+      byPath(result, "summary.wrong")
+    );
+    const unattempted = firstDefined(
+      result.unattempted,
+      result.unanswered,
+      byPath(result, "data.unattempted"),
+      byPath(result, "data.unanswered"),
+      byPath(result, "result.unattempted"),
+      byPath(result, "summary.unattempted")
+    );
+    const timeTakenSec = firstDefined(
+      result.timeTakenSec,
+      result.timeTaken,
+      byPath(result, "data.timeTakenSec"),
+      byPath(result, "result.timeTakenSec"),
+      byPath(result, "summary.timeTakenSec")
+    );
+    const violations = firstDefined(
+      result.violationCount,
+      result.violations,
+      byPath(result, "data.violationCount"),
+      byPath(result, "data.violations"),
+      byPath(result, "result.violationCount"),
+      byPath(result, "summary.violationCount")
+    );
+    setText("score", score, "-");
+    setText("correct", correct, "-");
+    setText("wrong", wrong, "-");
+    setText("unattempted", unattempted, "-");
+    setText("timeTaken", formatTime(timeTakenSec), "-");
+    setText("violations", violations, "0");
+    const statusNote = document.getElementById("statusNote");
+    if (result.status === "success" || result.ok === true) {
+      statusNote.textContent = "Exam submitted successfully.";
+    } else if (result.message) {
+      statusNote.textContent = result.message;
+    } else {
+      statusNote.textContent = "Result loaded.";
+    }
+    function clearExamStorage() {
+      localStorage.removeItem("neet_candidate");
+      localStorage.removeItem("neet_submitted");
+      localStorage.removeItem("neet_result");
+      localStorage.removeItem("neet_pending_submission");
+      localStorage.removeItem("candidateId");
+      localStorage.removeItem("token");
+      localStorage.removeItem("candidateName");
+      localStorage.removeItem("candidatePhone");
+      localStorage.removeItem("candidateEmail");
+      const keysToDelete = [];
       for (let i = 0; i < localStorage.length; i++) {
         const key = localStorage.key(i);
-        if (key && (key.startsWith('neet_exam_state_') || key.startsWith('neet_question_order_'))) {
-          removeKeys.push(key);
+        if (!key) continue;
+        if (
+          key.startsWith("neet_exam_state_") ||
+          key.startsWith("neet_question_order_")
+        ) {
+          keysToDelete.push(key);
         }
       }
-      removeKeys.forEach(key => localStorage.removeItem(key));
-      window.location.replace('login.html?v=' + Date.now());
+      keysToDelete.forEach(function(key) {
+        localStorage.removeItem(key);
+      });
+    }
+    function backToLogin() {
+      clearExamStorage();
+      window.location.href = "login.html?v=" + Date.now();
     }
   </script>
 </body>
