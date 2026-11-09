@@ -346,8 +346,8 @@
   </main>
 
   <script src="config.js?v=20261110a"></script>
-  <script>
 
+  <script>
     function safeParse(value) {
       try {
         return JSON.parse(value);
@@ -421,13 +421,18 @@
     // Result/submission keys are isolated by candidate + exam window.
 
     function candidateWindowStorageKey(prefix, candidateId) {
-      const cid = encodeURIComponent(String(candidateId || "").trim());
+      const cid = encodeURIComponent(
+        String(candidateId || "").trim()
+      );
+
       const startMs = Number.isFinite(window.EXAM_START_MS)
         ? window.EXAM_START_MS
         : 0;
+
       const endMs = Number.isFinite(window.EXAM_END_MS)
         ? window.EXAM_END_MS
         : 0;
+
       return prefix + "_" + cid + "_" + startMs + "_" + endMs;
     }
 
@@ -439,15 +444,26 @@
       candidate.candidateId || candidate.id || ""
     ).trim();
 
-    const resultKey = candidateWindowStorageKey("neet_result", candidateId);
-    const submittedKey = candidateWindowStorageKey("neet_submitted", candidateId);
+    const resultKey = candidateWindowStorageKey(
+      "neet_result",
+      candidateId
+    );
+
+    const submittedKey = candidateWindowStorageKey(
+      "neet_submitted",
+      candidateId
+    );
 
     let result = safeParse(
       localStorage.getItem(resultKey) || ""
     ) || {};
 
     // Never display a result whose embedded candidate ID differs.
-    if (result.candidateId && String(result.candidateId).trim() !== candidateId) {
+
+    if (
+      result.candidateId &&
+      String(result.candidateId).trim() !== candidateId
+    ) {
       result = {};
     }
 
@@ -461,7 +477,11 @@
 
     } else {
 
-      setText("candName", candidate.name, "-");
+      setText(
+        "candName",
+        candidate.name,
+        "-"
+      );
 
       setText(
         "candId",
@@ -551,10 +571,29 @@
 
     // Display result values.
 
-    setText("score", score, "-");
-    setText("correct", correct, "-");
-    setText("wrong", wrong, "-");
-    setText("unattempted", unattempted, "-");
+    setText(
+      "score",
+      score,
+      "-"
+    );
+
+    setText(
+      "correct",
+      correct,
+      "-"
+    );
+
+    setText(
+      "wrong",
+      wrong,
+      "-"
+    );
+
+    setText(
+      "unattempted",
+      unattempted,
+      "-"
+    );
 
     setText(
       "timeTaken",
@@ -592,12 +631,10 @@
     // Logout.
 
     function backToLogin() {
-
       clearExamStorage();
 
       window.location.href =
         "login.html?v=" + Date.now();
-
     }
 
   </script>
