@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -187,7 +188,7 @@
       <li>Use of multiple devices during the examination is strictly prohibited.</li>
       <li>Click <b>Submit</b> only when you are finished.</li>
       <li><b>Logout</b> and <b>Close</b> the Exam page once finished.</li>
-      <li>Remember Candidate ID to check the result</li>
+      <li>Remember Candidate ID to check the result.</li>
     </ul>
 
     <button class="btn" id="startBtn" disabled>Start Exam</button>
@@ -195,13 +196,18 @@
     <p id="msg"></p>
   </div>
 
-  <script src="config.js?v=20260709b"></script>
+  <!-- Load config before the inline script -->
+  <script src="config.js?v=20261110a"></script>
 
   <script>
+    // ============================================
+    // SAFE JSON PARSING
+    // ============================================
+
     function safeParse(value) {
       try {
         return JSON.parse(value);
-      } catch {
+      } catch (e) {
         return null;
       }
     }
@@ -215,17 +221,53 @@
         .replaceAll("'", "&#039;");
     }
 
-    const cand = safeParse(localStorage.getItem("neet_candidate") || "");
+    // ============================================
+    // CANDIDATE SESSION ISOLATION
+    // ============================================
 
-    if (!cand || !cand.token || !cand.candidateId) {
-      window.location.replace("login.html");
+    // Active candidate is stored separately for each browser tab.
+    const cand = safeParse(
+      sessionStorage.getItem("neet_candidate") || ""
+    ) || {};
+
+    const candidateId = String(
+      cand.candidateId || cand.id || ""
+    ).trim();
+
+    if (!cand.token || !candidateId) {
+      window.location.replace("login.html?v=20261110a");
       throw new Error("Login required");
     }
 
-    if (localStorage.getItem("neet_submitted") === "yes") {
-      window.location.replace("result.html");
-      throw new Error("Already submitted");
+    // Candidate + exam-window-specific storage key.
+    function candidateWindowStorageKey(prefix, id) {
+      const cid = encodeURIComponent(String(id || "").trim());
+
+      const startMs = Number.isFinite(window.EXAM_START_MS)
+        ? window.EXAM_START_MS
+        : 0;
+
+      const endMs = Number.isFinite(window.EXAM_END_MS)
+        ? window.EXAM_END_MS
+        : 0;
+
+      return prefix + "_" + cid + "_" + startMs + "_" + endMs;
     }
+
+    // Check submission status only for this candidate and exam window.
+    const submittedKey = candidateWindowStorageKey(
+      "neet_submitted",
+      candidateId
+    );
+
+    if (localStorage.getItem(submittedKey) === "yes") {
+      window.location.replace("result.html?v=20261110a");
+      throw new Error("This candidate has already submitted");
+    }
+
+    // ============================================
+    // PAGE ELEMENTS
+    // ============================================
 
     const istNow = document.getElementById("istNow");
     const startIST = document.getElementById("startIST");
@@ -237,18 +279,29 @@
 
     candidateInfo.innerHTML =
       "<b>Name:</b> " + escapeHtml(cand.name || "") +
-      " | <b>ID:</b> " + escapeHtml(cand.candidateId || "") +
+      " | <b>ID:</b> " + escapeHtml(candidateId) +
       " | <b>Email:</b> " + escapeHtml(cand.email || "");
+
+    // ============================================
+    // IST TIME FORMATTING
+    // ============================================
 
     if (typeof window.formatIST !== "function") {
       window.formatIST = function(dateOrMs = Date.now()) {
-        const d = typeof dateOrMs === "number" ? new Date(dateOrMs) : dateOrMs;
+        const d = typeof dateOrMs === "number"
+          ? new Date(dateOrMs)
+          : dateOrMs;
+
         return d.toLocaleString("en-IN", {
           timeZone: "Asia/Kolkata",
           hour12: true
         });
       };
     }
+
+    // ============================================
+    // EXAM WINDOW CHECK
+    // ============================================
 
     if (typeof window.isWithinExamWindow !== "function") {
       window.isWithinExamWindow = function(nowMs = Date.now()) {
@@ -259,7 +312,10 @@
           return true;
         }
 
-        return nowMs >= window.EXAM_START_MS && nowMs <= window.EXAM_END_MS;
+        return (
+          nowMs >= window.EXAM_START_MS &&
+          nowMs <= window.EXAM_END_MS
+        );
       };
     }
 
@@ -272,8 +328,13 @@
 
     function showSchedule() {
       if (hasValidSchedule()) {
-        startIST.textContent = window.formatIST(window.EXAM_START_MS);
-        endIST.textContent = window.formatIST(window.EXAM_END_MS);
+        startIST.textContent = window.formatIST(
+          window.EXAM_START_MS
+        );
+
+        endIST.textContent = window.formatIST(
+          window.EXAM_END_MS
+        );
       } else {
         startIST.textContent = "Not Set";
         endIST.textContent = "Not Set";
@@ -284,6 +345,10 @@
       statusTxt.textContent = text;
       statusTxt.className = className || "";
     }
+
+    // ============================================
+    // LIVE EXAM STATUS
+    // ============================================
 
     function tick() {
       istNow.textContent = window.formatIST(Date.now());
@@ -316,19 +381,29 @@
       msg.textContent = "";
     }
 
+    // ============================================
+    // START EXAM
+    // ============================================
+
     startBtn.addEventListener("click", function() {
       if (!window.isWithinExamWindow()) {
         tick();
         return;
       }
 
-      window.location.replace("exam.html?v=20260709b");
+      window.location.replace("exam.html?v=20261110a");
     });
+
+    // ============================================
+    // INITIALIZATION
+    // ============================================
 
     showSchedule();
     tick();
+
     setInterval(tick, 1000);
 
+    // Preserve existing browser back-button behaviour.
     history.replaceState(null, "", location.href);
 
     window.addEventListener("popstate", function() {
