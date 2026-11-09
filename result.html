@@ -345,6 +345,7 @@
 
   </main>
 
+  <script src="config.js?v=20261110a"></script>
   <script>
 
     function safeParse(value) {
@@ -416,19 +417,43 @@
       return s + " sec";
     }
 
-    // Read candidate and result from local storage.
+    // Candidate session is isolated to this browser tab.
+    // Result/submission keys are isolated by candidate + exam window.
+
+    function candidateWindowStorageKey(prefix, candidateId) {
+      const cid = encodeURIComponent(String(candidateId || "").trim());
+      const startMs = Number.isFinite(window.EXAM_START_MS)
+        ? window.EXAM_START_MS
+        : 0;
+      const endMs = Number.isFinite(window.EXAM_END_MS)
+        ? window.EXAM_END_MS
+        : 0;
+      return prefix + "_" + cid + "_" + startMs + "_" + endMs;
+    }
 
     const candidate = safeParse(
-      localStorage.getItem("neet_candidate") || ""
+      sessionStorage.getItem("neet_candidate") || ""
     ) || {};
 
-    const result = safeParse(
-      localStorage.getItem("neet_result") || ""
+    const candidateId = String(
+      candidate.candidateId || candidate.id || ""
+    ).trim();
+
+    const resultKey = candidateWindowStorageKey("neet_result", candidateId);
+    const submittedKey = candidateWindowStorageKey("neet_submitted", candidateId);
+
+    let result = safeParse(
+      localStorage.getItem(resultKey) || ""
     ) || {};
+
+    // Never display a result whose embedded candidate ID differs.
+    if (result.candidateId && String(result.candidateId).trim() !== candidateId) {
+      result = {};
+    }
 
     // Candidate information.
 
-    if (!candidate.candidateId) {
+    if (!candidateId || !candidate.token) {
 
       window.location.replace(
         "login.html?v=" + Date.now()
@@ -440,7 +465,7 @@
 
       setText(
         "candId",
-        candidate.candidateId,
+        candidateId,
         "-"
       );
 
@@ -543,41 +568,25 @@
       "0"
     );
 
-    // Clear exam storage on logout.
+    // Clear only the active tab's session and obsolete shared legacy keys.
+    // Candidate-scoped results and all exam states are deliberately retained.
 
     function clearExamStorage() {
+      sessionStorage.removeItem("neet_candidate");
 
-      localStorage.removeItem("neet_candidate");
-      localStorage.removeItem("neet_submitted");
-      localStorage.removeItem("neet_result");
-      localStorage.removeItem("neet_pending_submission");
-
-      localStorage.removeItem("candidateId");
-      localStorage.removeItem("token");
-      localStorage.removeItem("candidateName");
-      localStorage.removeItem("candidatePhone");
-      localStorage.removeItem("candidateEmail");
-
-      const keysToDelete = [];
-
-      for (let i = 0; i < localStorage.length; i++) {
-
-        const key = localStorage.key(i);
-
-        if (!key) continue;
-
-        if (
-          key.startsWith("neet_exam_state_") ||
-          key.startsWith("neet_question_order_")
-        ) {
-          keysToDelete.push(key);
-        }
-      }
-
-      keysToDelete.forEach(function(key) {
+      [
+        "neet_candidate",
+        "neet_submitted",
+        "neet_result",
+        "neet_pending_submission",
+        "candidateId",
+        "token",
+        "candidateName",
+        "candidatePhone",
+        "candidateEmail"
+      ].forEach(function(key) {
         localStorage.removeItem(key);
       });
-
     }
 
     // Logout.
