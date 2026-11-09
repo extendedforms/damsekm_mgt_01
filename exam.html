@@ -3,16 +3,9 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="theme-color" content="#003b66" />
   <title>NEET PG CBT - Exam</title>
-
-  <style>
+<style>
     * { box-sizing: border-box; }
-
-    html {
-      scroll-behavior: smooth;
-      scroll-padding-top: 52px;
-    }
 
     body {
       margin: 0;
@@ -43,7 +36,6 @@
     }
 
     .main {
-      min-width: 0;
       padding: 15px 45px;
       background: #ffffff;
     }
@@ -61,7 +53,6 @@
       font-weight: bold;
       margin-bottom: 12px;
       font-size: 15px;
-      scroll-margin-top: 52px;
     }
 
     .qtext {
@@ -72,7 +63,6 @@
       font-size: 15px;
       margin-bottom: 14px;
       white-space: pre-wrap;
-      overflow-wrap: anywhere;
     }
 
     .media-status {
@@ -121,13 +111,8 @@
       background: white;
       cursor: pointer;
       display: flex;
-      align-items: flex-start;
-      gap: 10px;
-      line-height: 1.4;
-
-      /* Allow vertical page scrolling on touch screens. */
-      touch-action: pan-y;
-      -webkit-tap-highlight-color: transparent;
+      align-items: center;
+      gap: 8px;
     }
 
     .opt:hover { background: #f6f8fb; }
@@ -138,21 +123,27 @@
       font-weight: bold;
     }
 
-    .opt input[type="radio"] {
-      flex: 0 0 auto;
-      width: 18px;
-      height: 18px;
-      margin: 1px 0 0;
-      accent-color: #0057d9;
-      cursor: pointer;
+    .radio-circle {
+      width: 13px;
+      height: 13px;
+      min-width: 13px;
+      border-radius: 50%;
+      border: 2px solid #8a8a8a;
+      display: inline-block;
+      position: relative;
     }
 
-    .optText {
-      flex: 1 1 auto;
-      min-width: 0;
-      overflow-wrap: anywhere;
-      user-select: text;
-      -webkit-user-select: text;
+    .opt.selected .radio-circle { border-color: #0057d9; }
+
+    .opt.selected .radio-circle::after {
+      content: "";
+      width: 7px;
+      height: 7px;
+      background: #0057d9;
+      border-radius: 50%;
+      position: absolute;
+      left: 1px;
+      top: 1px;
     }
 
     .actions {
@@ -171,7 +162,6 @@
       font-weight: bold;
       cursor: pointer;
       font-size: 13px;
-      touch-action: manipulation;
     }
 
     button:hover { opacity: 0.9; }
@@ -193,7 +183,6 @@
       max-height: calc(100vh - 34px);
       overflow-y: auto;
       scroll-behavior: smooth;
-      -webkit-overflow-scrolling: touch;
     }
 
     .palette h3 {
@@ -301,7 +290,6 @@
       justify-content: center;
       align-items: center;
       overflow: auto;
-      -webkit-overflow-scrolling: touch;
     }
 
     .img-modal-body img {
@@ -311,13 +299,11 @@
     }
 
     @media (max-width: 768px) {
-      html { scroll-padding-top: 54px; }
-
       .topbar {
+        height: auto;
         min-height: 36px;
         font-size: 13px;
         padding: 8px 10px;
-        gap: 8px;
       }
 
       .layout { display: block; }
@@ -327,21 +313,19 @@
       .qtext { font-size: 14px; }
 
       .qimg,
-      .qvideo,
-      #qImgWrap img {
+      .qvideo {
         max-height: 360px;
       }
 
       .opt {
         font-size: 14px;
-        padding: 12px 10px;
-        min-height: 44px;
+        padding: 10px;
       }
 
       .actions { gap: 6px; }
 
       .actions button {
-        padding: 9px 10px;
+        padding: 8px 10px;
         font-size: 12px;
       }
 
@@ -370,40 +354,17 @@
 
     @media (max-width: 380px) {
       #pal { grid-template-columns: repeat(5, 42px); }
-
-      .topbar { font-size: 11px; }
     }
-
-    #qImgWrap img {
-      width: 100%;
-      max-height: 520px;
-      object-fit: contain;
-      display: block;
-      margin: 12px auto;
-      border: 1px solid #ddd;
-      border-radius: 4px;
-      cursor: zoom-in;
-      background: #fff;
-    }
-
-    #imgModalPic {
-      max-width: 95%;
-      max-height: 95%;
-      object-fit: contain;
-    }
-
-    .student-info { margin-bottom: 10px; }
-    .schedule-info { font-size: 12px; font-weight: normal; }
+  
+    #qImgWrap img { width:100%; max-height:520px; object-fit:contain; display:block; margin:12px auto; border:1px solid #ddd; border-radius:4px; cursor:zoom-in; background:#fff; }
+    #imgModalPic { max-width:95%; max-height:95%; object-fit:contain; }
+    .student-info { margin-bottom:10px; }
+    .schedule-info { font-size:12px; font-weight:normal; }
   </style>
 </head>
-
 <body>
   <header class="topbar">
-    <div>
-      NEET PG CBT
-      <span class="schedule-info"> | IST: <span id="istClock">--</span></span>
-    </div>
-
+    <div>NEET PG CBT <span class="schedule-info"> | IST: <span id="istClock">--</span></span></div>
     <div>
       Time Left: <b id="timeLeft">60:00</b>
       &nbsp; | &nbsp;
@@ -415,32 +376,23 @@
     <main class="main">
       <div class="qbox">
         <div class="student-info" id="studentInfo"></div>
-
         <div class="student-info schedule-info">
-          Exam window:
-          <span id="examStartIST">--</span>
-          to
-          <span id="examEndIST">--</span>
+          Exam window: <span id="examStartIST">--</span> to <span id="examEndIST">--</span>
         </div>
-
         <div id="qTitle" class="qtitle">Loading examination...</div>
         <div id="qText" class="qtext"></div>
         <div id="qImgWrap"></div>
         <div id="opts" class="opts"></div>
 
         <div class="actions">
-          <button id="prevBtn" type="button" disabled>Previous</button>
-          <button id="clearBtn" type="button" disabled>Clear Response</button>
-          <button id="markBtn" type="button" disabled>Mark for Review</button>
-          <button id="nextBtn" type="button" disabled>Next</button>
+          <button id="prevBtn" type="button">Previous</button>
+          <button id="clearBtn" type="button">Clear Response</button>
+          <button id="markBtn" type="button">Mark for Review</button>
+          <button id="nextBtn" type="button">Next</button>
         </div>
-
         <div class="actions">
-          <button id="submitBtn" class="danger" type="button" disabled>
-            Submit
-          </button>
+          <button id="submitBtn" class="danger" type="button">Submit</button>
         </div>
-
         <div class="warning" id="warning"></div>
       </div>
     </main>
@@ -448,7 +400,6 @@
     <aside class="palette" id="paletteBox">
       <h3>Questions</h3>
       <div id="pal"></div>
-
       <div class="legend">
         <div><span class="dot unanswered"></span> Unanswered</div>
         <div><span class="dot answered"></span> Answered</div>
@@ -463,15 +414,13 @@
       <button id="imgFullBtn" type="button">Fullscreen</button>
       <button id="imgCloseBtn" class="danger" type="button">Close</button>
     </div>
-
     <div class="img-modal-body">
       <img id="imgModalPic" alt="Question image enlarged" />
     </div>
   </div>
 
-  <!-- Load configuration first, then the single secure exam controller. -->
-  <!-- Do not add questions.js or any client-side answer-key script here. -->
-  <script src="config.js?v=20261108c"></script>
-  <script src="exam.js?v=20261108d"></script>
+  <!-- Load configuration first, then the single exam controller. -->
+  <script src="config.js?v=20261110a"></script>
+  <script src="exam.js?v=20261110a"></script>
 </body>
 </html>
