@@ -21,28 +21,72 @@ function safeParse(s) {
   }
 }
 
-const cand = safeParse(localStorage.getItem('neet_candidate') || '');
+// Candidate session is isolated to the current browser tab.
 
-if (!cand || !cand.token) {
-  location.replace('login.html');
-  throw new Error('Candidate session missing; redirecting to login.');
+const cand = safeParse(
+  sessionStorage.getItem('neet_candidate') || ''
+);
+
+const activeCandidateId = String(
+  cand?.candidateId || cand?.id || ''
+).trim();
+
+function candidateWindowStorageKey(prefix, candidateId) {
+  const cid = encodeURIComponent(
+    String(candidateId || '').trim()
+  );
+
+  const startMs = Number.isFinite(window.EXAM_START_MS)
+    ? window.EXAM_START_MS
+    : 0;
+
+  const endMs = Number.isFinite(window.EXAM_END_MS)
+    ? window.EXAM_END_MS
+    : 0;
+
+  return `${prefix}_${cid}_${startMs}_${endMs}`;
 }
 
-if (localStorage.getItem('neet_submitted') === 'yes') {
+const SUBMITTED_KEY = candidateWindowStorageKey(
+  'neet_submitted',
+  activeCandidateId
+);
+
+const RESULT_KEY = candidateWindowStorageKey(
+  'neet_result',
+  activeCandidateId
+);
+
+if (!cand || !cand.token || !activeCandidateId) {
+  location.replace('login.html');
+
+  throw new Error(
+    'Candidate session missing; redirecting to login.'
+  );
+}
+
+if (localStorage.getItem(SUBMITTED_KEY) === 'yes') {
   location.replace('result.html');
-  throw new Error('This candidate has already submitted; redirecting to result.');
+
+  throw new Error(
+    'This candidate has already submitted; redirecting to result.'
+  );
 }
 
 let Q = [];
 let totalQ = 0;
 let state = null;
 let submitted = false;
+
 let serverEndsAtMs = 0;
 let serverStartedAtMs = 0;
 let serverClockOffsetMs = 0;
+
 let attemptReady = false;
+
 let suppressVioUntil = 0;
 let lastViolationAt = 0;
+
 let authoritativeViolationCount = 0;
 let timerIntervalId = null;
 
@@ -54,7 +98,9 @@ function canCountViolation() {
   return Date.now() > suppressVioUntil;
 }
 
-const IS_IOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
+const IS_IOS = /iPhone|iPad|iPod/i.test(
+  navigator.userAgent
+);
 
 function formatIndianTime(dateOrMs = Date.now()) {
   const d = typeof dateOrMs === 'number'
@@ -72,7 +118,8 @@ function formatIndianTime(dateOrMs = Date.now()) {
     hour12: true
   }).formatToParts(d);
 
-  const get = t => parts.find(p => p.type === t)?.value || '';
+  const get = t =>
+    parts.find(p => p.type === t)?.value || '';
 
   return `${get('day')}-${get('month')}-${get('year')} ${get('hour')}:${get('minute')}:${get('second')} ${(get('dayPeriod') || '').toUpperCase()}`;
 }
@@ -92,27 +139,33 @@ if (istClock) {
   };
 
   tick();
+
   setInterval(tick, 1000);
 }
 
 if (examStartEl) {
   examStartEl.textContent = Number.isFinite(window.EXAM_START_MS)
-    ? (window.formatIST
-        ? window.formatIST(window.EXAM_START_MS)
-        : formatIndianTime(window.EXAM_START_MS))
+    ? (
+        window.formatIST
+          ? window.formatIST(window.EXAM_START_MS)
+          : formatIndianTime(window.EXAM_START_MS)
+      )
     : '--';
 }
 
 if (examEndEl) {
   examEndEl.textContent = Number.isFinite(window.EXAM_END_MS)
-    ? (window.formatIST
-        ? window.formatIST(window.EXAM_END_MS)
-        : formatIndianTime(window.EXAM_END_MS))
+    ? (
+        window.formatIST
+          ? window.formatIST(window.EXAM_END_MS)
+          : formatIndianTime(window.EXAM_END_MS)
+      )
     : '--';
 }
 
 const elTime = document.getElementById('timeLeft');
 const elVio = document.getElementById('vio');
+
 const pal = document.getElementById('pal');
 const qTitle = document.getElementById('qTitle');
 const qText = document.getElementById('qText');
@@ -131,7 +184,9 @@ const imgCloseBtn = document.getElementById('imgCloseBtn');
 const imgFullBtn = document.getElementById('imgFullBtn');
 
 function buildStateKey() {
-  const cid = String(cand?.candidateId || cand?.id || 'guest');
+  const cid = String(
+    cand?.candidateId || cand?.id || 'guest'
+  );
 
   const startMs = Number.isFinite(window.EXAM_START_MS)
     ? window.EXAM_START_MS
@@ -145,6 +200,7 @@ function buildStateKey() {
 }
 
 const KEY = buildStateKey();
+
 const LEGACY_KEY = 'neet_exam_state';
 
 function defaultState() {
@@ -161,9 +217,15 @@ function save() {
   if (!state) return;
 
   try {
-    localStorage.setItem(KEY, JSON.stringify(state));
+    localStorage.setItem(
+      KEY,
+      JSON.stringify(state)
+    );
   } catch (e) {
-    console.warn('Could not save exam state locally:', e);
+    console.warn(
+      'Could not save exam state locally:',
+      e
+    );
   }
 }
 
@@ -172,33 +234,52 @@ function pad2(n) {
 }
 
 async function postAPI(payload, options = {}) {
-  const API_URL = window.API_URL || window.EXAM_API_URL || '';
+  const API_URL =
+    window.API_URL ||
+    window.EXAM_API_URL ||
+    '';
 
   if (!API_URL) {
-    throw new Error('API_URL not set in config.js');
+    throw new Error(
+      'API_URL not set in config.js'
+    );
   }
 
   const ctrl = new AbortController();
+
   const timeoutMs = Number(options.timeoutMs) || 30000;
-  const timer = setTimeout(() => ctrl.abort(), timeoutMs);
+
+  const timer = setTimeout(
+    () => ctrl.abort(),
+    timeoutMs
+  );
 
   try {
     const fetchOptions = {
       method: 'POST',
+
       headers: {
         'Content-Type': 'text/plain;charset=utf-8'
       },
+
       body: JSON.stringify(payload),
+
       cache: 'no-store',
+
       signal: ctrl.signal
     };
 
     // Useful for small violation reports during page/app transitions.
+
     if (options.keepalive === true) {
       fetchOptions.keepalive = true;
     }
 
-    const res = await fetch(API_URL, fetchOptions);
+    const res = await fetch(
+      API_URL,
+      fetchOptions
+    );
+
     const txt = await res.text();
 
     let data;
@@ -213,7 +294,9 @@ async function postAPI(payload, options = {}) {
 
     if (!res.ok || data.ok === false) {
       throw new Error(
-        data.error || data.message || ('HTTP ' + res.status)
+        data.error ||
+        data.message ||
+        ('HTTP ' + res.status)
       );
     }
 
@@ -221,9 +304,13 @@ async function postAPI(payload, options = {}) {
 
   } catch (err) {
     if (err && err.name === 'AbortError') {
-      throw new Error('The server took too long to respond. Check your internet connection and retry.');
+      throw new Error(
+        'The server took too long to respond. Check your internet connection and retry.'
+      );
     }
+
     throw err;
+
   } finally {
     clearTimeout(timer);
   }
@@ -233,21 +320,32 @@ function loadLocalState() {
   // Do not migrate the old global state key into a server-managed attempt.
   // It may contain answers from a different exam or question ordering.
 
-  let loaded = safeParse(localStorage.getItem(KEY) || '');
+  let loaded = safeParse(
+    localStorage.getItem(KEY) || ''
+  );
 
   if (!loaded || typeof loaded !== 'object') {
     loaded = defaultState();
   }
 
-  if (!loaded.answers || typeof loaded.answers !== 'object') {
+  if (
+    !loaded.answers ||
+    typeof loaded.answers !== 'object'
+  ) {
     loaded.answers = {};
   }
 
-  if (!loaded.marked || typeof loaded.marked !== 'object') {
+  if (
+    !loaded.marked ||
+    typeof loaded.marked !== 'object'
+  ) {
     loaded.marked = {};
   }
 
-  if (!Number.isFinite(loaded.current) || loaded.current < 0) {
+  if (
+    !Number.isFinite(loaded.current) ||
+    loaded.current < 0
+  ) {
     loaded.current = 0;
   }
 
@@ -261,8 +359,12 @@ function loadLocalState() {
 
   loaded.startedAt = serverStartedAtMs;
 
-  // Keep only this server-issued attempt's question IDs and valid option IDs.
-  const allowedIds = new Set(Q.map(q => String(q.id)));
+  // Keep only this server-issued attempt's question IDs
+  // and valid option IDs.
+
+  const allowedIds = new Set(
+    Q.map(q => String(q.id))
+  );
 
   Object.keys(loaded.answers).forEach(id => {
     if (
@@ -273,7 +375,8 @@ function loadLocalState() {
     ) {
       delete loaded.answers[id];
     } else {
-      loaded.answers[id] = String(loaded.answers[id]).toUpperCase();
+      loaded.answers[id] =
+        String(loaded.answers[id]).toUpperCase();
     }
   });
 
@@ -281,14 +384,17 @@ function loadLocalState() {
     if (!allowedIds.has(String(id))) {
       delete loaded.marked[id];
     } else {
-      loaded.marked[id] = loaded.marked[id] === true;
+      loaded.marked[id] =
+        loaded.marked[id] === true;
     }
   });
 
   state = loaded;
+
   save();
 
   // Remove the obsolete shared key.
+
   try {
     localStorage.removeItem(LEGACY_KEY);
   } catch (e) {}
@@ -298,9 +404,17 @@ function palClass(qid) {
   const a = state.answers[qid];
   const m = !!state.marked[qid];
 
-  if (a === undefined && !m) return 'pbtn unanswered';
-  if (a !== undefined && !m) return 'pbtn answered';
-  if (a === undefined && m) return 'pbtn review';
+  if (a === undefined && !m) {
+    return 'pbtn unanswered';
+  }
+
+  if (a !== undefined && !m) {
+    return 'pbtn answered';
+  }
+
+  if (a === undefined && m) {
+    return 'pbtn review';
+  }
 
   return 'pbtn ansreview';
 }
@@ -310,6 +424,7 @@ function scrollToQuestionTop() {
 
   requestAnimationFrame(() => {
     const topbar = document.querySelector('.topbar');
+
     const stickyOffset = topbar
       ? topbar.getBoundingClientRect().height
       : 0;
@@ -331,10 +446,14 @@ function preloadNextQuestionImage() {
   if (!state || !Q.length) return;
 
   const next = Q[state.current + 1];
+
   if (!next || !next.image) return;
 
-  // Only preload the next image, rather than downloading every image at once.
+  // Only preload the next image,
+  // rather than downloading every image at once.
+
   const preloader = new Image();
+
   preloader.decoding = 'async';
   preloader.src = next.image;
 }
@@ -349,11 +468,14 @@ function renderPalette() {
 
     b.type = 'button';
     b.textContent = idx + 1;
-    b.className = palClass(q.id) +
+
+    b.className =
+      palClass(q.id) +
       (idx === state.current ? ' current' : '');
 
     b.addEventListener('click', () => {
       state.current = idx;
+
       save();
       render();
       scrollToQuestionTop();
@@ -367,16 +489,26 @@ function openImgModal(src) {
   if (!imgModal || !imgModalPic) return;
 
   suppressViolations(1500);
+
   imgModalPic.src = src;
+
   imgModal.classList.add('show');
-  imgModal.setAttribute('aria-hidden', 'false');
+
+  imgModal.setAttribute(
+    'aria-hidden',
+    'false'
+  );
 }
 
 function closeImgModal() {
   if (!imgModal) return;
 
   imgModal.classList.remove('show');
-  imgModal.setAttribute('aria-hidden', 'true');
+
+  imgModal.setAttribute(
+    'aria-hidden',
+    'true'
+  );
 
   if (imgModalPic) {
     imgModalPic.removeAttribute('src');
@@ -384,17 +516,24 @@ function closeImgModal() {
 }
 
 if (imgCloseBtn) {
-  imgCloseBtn.addEventListener('click', closeImgModal);
+  imgCloseBtn.addEventListener(
+    'click',
+    closeImgModal
+  );
 }
 
 if (imgModal) {
   imgModal.addEventListener('click', e => {
-    if (e.target === imgModal) closeImgModal();
+    if (e.target === imgModal) {
+      closeImgModal();
+    }
   });
 }
 
 document.addEventListener('keydown', e => {
-  if (e.key === 'Escape') closeImgModal();
+  if (e.key === 'Escape') {
+    closeImgModal();
+  }
 });
 
 if (imgFullBtn) {
@@ -402,15 +541,28 @@ if (imgFullBtn) {
     suppressViolations(4000);
 
     try {
-      if (imgModalPic && imgModalPic.requestFullscreen) {
+      if (
+        imgModalPic &&
+        imgModalPic.requestFullscreen
+      ) {
         await imgModalPic.requestFullscreen();
-      } else if (imgModal && imgModal.requestFullscreen) {
+
+      } else if (
+        imgModal &&
+        imgModal.requestFullscreen
+      ) {
         await imgModal.requestFullscreen();
+
       } else {
-        alert('Fullscreen not supported on this device/browser.');
+        alert(
+          'Fullscreen not supported on this device/browser.'
+        );
       }
+
     } catch (err) {
-      alert('Fullscreen blocked: ' + err.message);
+      alert(
+        'Fullscreen blocked: ' + err.message
+      );
     }
   });
 }
@@ -418,7 +570,9 @@ if (imgFullBtn) {
 function setAnswer(qid, optionId) {
   if (!state) return;
 
-  state.answers[qid] = String(optionId).toUpperCase();
+  state.answers[qid] =
+    String(optionId).toUpperCase();
+
   save();
   renderPalette();
 }
@@ -427,6 +581,7 @@ function clearAnswer(qid) {
   if (!state) return;
 
   delete state.answers[qid];
+
   save();
   renderPalette();
 }
@@ -434,7 +589,9 @@ function clearAnswer(qid) {
 function toggleMark(qid) {
   if (!state) return;
 
-  state.marked[qid] = !state.marked[qid];
+  state.marked[qid] =
+    !state.marked[qid];
+
   save();
   renderPalette();
 }
@@ -443,16 +600,12 @@ function render() {
   if (!state) return;
 
   const q = Q[state.current];
+
   if (!q) return;
 
-  // These controls start disabled in exam.html while questions load.
-  // Enable them only after the server confirms a valid active attempt.
-  [clearBtn, markBtn, submitBtn].forEach(button => {
-    if (button) button.disabled = !attemptReady || submitted;
-  });
-
   if (qTitle) {
-    qTitle.textContent = `Question ${state.current + 1} of ${totalQ}`;
+    qTitle.textContent =
+      `Question ${state.current + 1} of ${totalQ}`;
   }
 
   if (qText) {
@@ -468,15 +621,24 @@ function render() {
       img.src = q.image;
       img.alt = 'Question image';
       img.title = 'Tap to zoom';
+
       img.loading = 'eager';
       img.decoding = 'async';
       img.fetchPriority = 'high';
 
-      img.addEventListener('click', () => openImgModal(q.image));
+      img.addEventListener('click', () => {
+        openImgModal(q.image);
+      });
 
       img.addEventListener('error', () => {
-        console.warn('Question image failed to load:', q.image);
-        img.alt = 'Question image could not be loaded';
+        console.warn(
+          'Question image failed to load:',
+          q.image
+        );
+
+        img.alt =
+          'Question image could not be loaded';
+
       }, { once: true });
 
       qImgWrap.appendChild(img);
@@ -490,17 +652,28 @@ function render() {
 
     (q.options || []).forEach(option => {
       const row = document.createElement('label');
+
       row.className = 'opt';
-      row.classList.toggle('selected', picked === option.id);
+
+      row.classList.toggle(
+        'selected',
+        picked === option.id
+      );
 
       const radio = document.createElement('input');
+
       radio.type = 'radio';
       radio.name = 'opt';
       radio.value = option.id;
-      radio.checked = (picked === option.id);
-      radio.setAttribute('aria-label', option.text || `Option ${option.id}`);
+      radio.checked = picked === option.id;
+
+      radio.setAttribute(
+        'aria-label',
+        option.text || `Option ${option.id}`
+      );
 
       const span = document.createElement('span');
+
       span.className = 'optText';
       span.textContent = option.text;
 
@@ -508,41 +681,49 @@ function render() {
       // Do not select on touchstart, pointerdown or generic row click.
       // Those events also occur while a candidate is scrolling.
       // Native radio change fires only when the control is actually selected.
+
       radio.addEventListener('change', () => {
         if (radio.checked) {
           setAnswer(q.id, option.id);
 
-          // Update visual selection without rebuilding the radio while
-          // the browser is completing its native touch interaction.
+          // Update visual selection without rebuilding the radio
+          // while the browser is completing its native touch interaction.
+
           opts.querySelectorAll('.opt').forEach(el => {
             el.classList.remove('selected');
           });
+
           row.classList.add('selected');
         }
       });
 
       row.appendChild(radio);
       row.appendChild(span);
+
       opts.appendChild(row);
     });
   }
 
   if (elVio) {
-    elVio.textContent = String(state.violations || 0);
+    elVio.textContent =
+      String(state.violations || 0);
   }
 
   if (prevBtn) {
-    prevBtn.disabled = state.current <= 0;
+    prevBtn.disabled =
+      state.current <= 0;
   }
 
   if (nextBtn) {
-    nextBtn.disabled = state.current >= totalQ - 1;
+    nextBtn.disabled =
+      state.current >= totalQ - 1;
   }
 
   if (markBtn) {
-    markBtn.textContent = state.marked[q.id]
-      ? 'Unmark'
-      : 'Mark for Review';
+    markBtn.textContent =
+      state.marked[q.id]
+        ? 'Unmark'
+        : 'Mark for Review';
   }
 
   renderPalette();
@@ -553,6 +734,7 @@ if (prevBtn) {
   prevBtn.addEventListener('click', () => {
     if (state && state.current > 0) {
       state.current--;
+
       save();
       render();
       scrollToQuestionTop();
@@ -564,6 +746,7 @@ if (nextBtn) {
   nextBtn.addEventListener('click', () => {
     if (state && state.current < totalQ - 1) {
       state.current++;
+
       save();
       render();
       scrollToQuestionTop();
@@ -609,11 +792,18 @@ async function postViolation(type, details = '') {
       action: 'violation',
       token: cand.token,
       candidateId: cand.candidateId || cand.id || '',
-      type,
-      details
-    }, { timeoutMs: 12000, keepalive: true });
+      type: type,
+      details: details
+    }, {
+      timeoutMs: 12000,
+      keepalive: true
+    });
 
-    if (Number.isFinite(Number(data.violationCount))) {
+    if (
+      Number.isFinite(
+        Number(data.violationCount)
+      )
+    ) {
       authoritativeViolationCount = Math.max(
         authoritativeViolationCount,
         Number(data.violationCount)
@@ -628,21 +818,37 @@ async function postViolation(type, details = '') {
     save();
 
     if (elVio) {
-      elVio.textContent = String(state.violations || 0);
+      elVio.textContent =
+        String(state.violations || 0);
     }
 
   } catch (err) {
-    console.warn('Violation log failed:', err);
+    console.warn(
+      'Violation log failed:',
+      err
+    );
   }
 }
 
 function addViolation(reason) {
-  if (!canCountViolation() || !state || !attemptReady || submitted) return;
+  if (
+    !canCountViolation() ||
+    !state ||
+    !attemptReady ||
+    submitted
+  ) {
+    return;
+  }
 
   // A single app/tab switch may emit both visibilitychange and blur.
   // Treat events within this short interval as the same incident.
+
   const now = Date.now();
-  if (now - lastViolationAt < 2000) return;
+
+  if (now - lastViolationAt < 2000) {
+    return;
+  }
+
   lastViolationAt = now;
 
   state.violations = Math.max(
@@ -653,7 +859,8 @@ function addViolation(reason) {
   save();
 
   if (elVio) {
-    elVio.textContent = String(state.violations);
+    elVio.textContent =
+      String(state.violations);
   }
 
   postViolation(
@@ -679,7 +886,11 @@ document.addEventListener('visibilitychange', () => {
 window.addEventListener('blur', () => {
   // iOS app switching is more consistently detected through visibilitychange.
   // On desktop, count focus loss only if the page is still visible.
-  if (!IS_IOS && document.visibilityState === 'visible') {
+
+  if (
+    !IS_IOS &&
+    document.visibilityState === 'visible'
+  ) {
     addViolation('WINDOW_BLUR');
   }
 });
@@ -687,10 +898,16 @@ window.addEventListener('blur', () => {
 function updateTimer() {
   if (submitted || !attemptReady) return;
 
-  const estimatedServerNow = Date.now() + serverClockOffsetMs;
-  const left = Math.max(0, serverEndsAtMs - estimatedServerNow);
+  const estimatedServerNow =
+    Date.now() + serverClockOffsetMs;
+
+  const left = Math.max(
+    0,
+    serverEndsAtMs - estimatedServerNow
+  );
 
   const secs = Math.floor(left / 1000);
+
   const hh = Math.floor(secs / 3600);
   const mm = Math.floor((secs % 3600) / 60);
   const ss = secs % 60;
@@ -701,42 +918,76 @@ function updateTimer() {
   }
 
   if (left <= 0) {
-    submitExam(true, 'SERVER_DEADLINE_REACHED');
+    submitExam(
+      true,
+      'SERVER_DEADLINE_REACHED'
+    );
   }
 }
 
-async function submitExam(isAuto = false, reason = 'SUBMIT') {
-  if (submitted || !attemptReady || !state) return;
+async function submitExam(
+  isAuto = false,
+  reason = 'SUBMIT'
+) {
+  if (
+    submitted ||
+    !attemptReady ||
+    !state
+  ) {
+    return;
+  }
 
   submitted = true;
 
-  [submitBtn, prevBtn, nextBtn, clearBtn, markBtn].forEach(b => {
+  [
+    submitBtn,
+    prevBtn,
+    nextBtn,
+    clearBtn,
+    markBtn
+  ].forEach(b => {
     if (b) b.disabled = true;
   });
 
   try {
     // Only selected option IDs and review markers leave the browser.
+    // Server calculates the actual score.
+
     const data = await postAPI({
       action: 'submit',
       token: cand.token,
       candidateId: cand.candidateId || cand.id || '',
       answers: state.answers || {},
       marked: state.marked || {},
-      reason,
+      reason: reason,
       isAuto: !!isAuto,
       userAgent: navigator.userAgent || ''
-    }, { timeoutMs: 30000 });
+    }, {
+      timeoutMs: 30000
+    });
+
+    if (
+      data.candidateId &&
+      String(data.candidateId).trim() !== activeCandidateId
+    ) {
+      throw new Error(
+        'Server returned a result for a different candidate. Submission was not saved in this session.'
+      );
+    }
 
     const result = {
       name: data.name || cand.name || '',
-      candidateId: data.candidateId ||
-        cand.candidateId || cand.id || '',
+
+      candidateId:
+        data.candidateId || activeCandidateId,
+
       score: data.score,
       correct: data.correct,
       wrong: data.wrong,
       unattempted: data.unattempted,
       totalQuestions: data.totalQuestions,
       timeTakenSec: data.timeTakenSec,
+
       violations: (
         data.violations !== undefined
           ? data.violations
@@ -746,14 +997,27 @@ async function submitExam(isAuto = false, reason = 'SUBMIT') {
                 : (state.violations || 0)
             )
       ),
-      startedAt: data.startedAt ||
+
+      startedAt:
+        data.startedAt ||
         formatIndianTime(serverStartedAtMs),
-      endedAt: data.endedAt ||
+
+      endedAt:
+        data.endedAt ||
         formatIndianTime(Date.now())
     };
 
-    localStorage.setItem('neet_submitted', 'yes');
-    localStorage.setItem('neet_result', JSON.stringify(result));
+    // Save this candidate's result only.
+
+    localStorage.setItem(
+      SUBMITTED_KEY,
+      'yes'
+    );
+
+    localStorage.setItem(
+      RESULT_KEY,
+      JSON.stringify(result)
+    );
 
     try {
       localStorage.removeItem(KEY);
@@ -768,36 +1032,93 @@ async function submitExam(isAuto = false, reason = 'SUBMIT') {
   } catch (err) {
     alert(
       'Submission failed: ' +
-      (err && err.message ? err.message : err)
+      (
+        err && err.message
+          ? err.message
+          : err
+      )
     );
 
     submitted = false;
 
-    [submitBtn, prevBtn, nextBtn, clearBtn, markBtn].forEach(b => {
+    [
+      submitBtn,
+      prevBtn,
+      nextBtn,
+      clearBtn,
+      markBtn
+    ].forEach(b => {
       if (b) b.disabled = false;
     });
   }
 }
 
 async function init() {
-  if (qTitle) qTitle.textContent = 'Loading questionsâ¦';
-  if (qText) qText.textContent = 'Please wait. Your examination is being prepared.';
+  if (qTitle) {
+    qTitle.textContent = 'Loading questions…';
+  }
+
+  if (qText) {
+    qText.textContent =
+      'Please wait. Your examination is being prepared.';
+  }
 
   try {
     const data = await postAPI({
       action: 'startExam',
       token: cand.token,
       candidateId: cand.candidateId || cand.id || ''
-    }, { timeoutMs: 45000 });
+    }, {
+      timeoutMs: 45000
+    });
 
     if (data.alreadySubmitted) {
-      localStorage.setItem('neet_submitted', 'yes');
-      localStorage.setItem('neet_result', JSON.stringify(data));
+      if (
+        data.candidateId &&
+        String(data.candidateId).trim() !== activeCandidateId
+      ) {
+        throw new Error(
+          'Server returned a submitted result for a different candidate.'
+        );
+      }
+
+      const priorResult = Object.assign(
+        {},
+        data,
+        {
+          candidateId:
+            data.candidateId || activeCandidateId
+        }
+      );
+
+      localStorage.setItem(
+        SUBMITTED_KEY,
+        'yes'
+      );
+
+      localStorage.setItem(
+        RESULT_KEY,
+        JSON.stringify(priorResult)
+      );
+
       location.replace('result.html');
+
       return;
     }
 
-    if (!Array.isArray(data.questions) || !data.questions.length) {
+    if (
+      data.candidateId &&
+      String(data.candidateId).trim() !== activeCandidateId
+    ) {
+      throw new Error(
+        'Server returned an exam attempt for a different candidate.'
+      );
+    }
+
+    if (
+      !Array.isArray(data.questions) ||
+      !data.questions.length
+    ) {
       throw new Error(
         'No questions were returned by the secure question service.'
       );
@@ -806,13 +1127,15 @@ async function init() {
     Q = data.questions;
     totalQ = Q.length;
 
-    serverStartedAtMs = new Date(data.startedAtISO).getTime();
+    serverStartedAtMs =
+      new Date(data.startedAtISO).getTime();
 
     serverClockOffsetMs = data.serverNowISO
       ? new Date(data.serverNowISO).getTime() - Date.now()
       : 0;
 
-    serverEndsAtMs = new Date(data.endsAtISO).getTime();
+    serverEndsAtMs =
+      new Date(data.endsAtISO).getTime();
 
     if (
       !Number.isFinite(serverStartedAtMs) ||
@@ -837,6 +1160,7 @@ async function init() {
     );
 
     attemptReady = true;
+
     save();
 
     if (!inExamWindowDisplayOnly()) {
@@ -847,18 +1171,35 @@ async function init() {
 
     updateTimer();
 
-    if (timerIntervalId) clearInterval(timerIntervalId);
-    timerIntervalId = setInterval(updateTimer, 1000);
+    if (timerIntervalId) {
+      clearInterval(timerIntervalId);
+    }
+
+    timerIntervalId = setInterval(
+      updateTimer,
+      1000
+    );
 
     render();
 
   } catch (err) {
-    console.error('Exam initialization failed:', err);
+    console.error(
+      'Exam initialization failed:',
+      err
+    );
 
-    if (qTitle) qTitle.textContent = 'Unable to load examination';
+    if (qTitle) {
+      qTitle.textContent =
+        'Unable to load examination';
+    }
+
     if (qText) {
       qText.textContent =
-        (err && err.message ? err.message : 'Please refresh or contact the administrator.');
+        (
+          err && err.message
+            ? err.message
+            : 'Please refresh or contact the administrator.'
+        );
     }
 
     if (submitBtn) submitBtn.disabled = true;
@@ -870,8 +1211,12 @@ async function init() {
 }
 
 function inExamWindowDisplayOnly() {
-  // Informational only. Apps Script enforces the real schedule.
-  if (typeof window.isWithinExamWindow !== 'function') {
+  // Informational only.
+  // Apps Script enforces the real schedule.
+
+  if (
+    typeof window.isWithinExamWindow !== 'function'
+  ) {
     return true;
   }
 
