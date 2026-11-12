@@ -1,9 +1,11 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>DAMS TRIVANDRUM - NEET PG CBT - Exam</title>
+
 <style>
     * { box-sizing: border-box; }
 
@@ -355,16 +357,60 @@
     @media (max-width: 380px) {
       #pal { grid-template-columns: repeat(5, 42px); }
     }
-  
-    #qImgWrap img { width:100%; max-height:520px; object-fit:contain; display:block; margin:12px auto; border:1px solid #ddd; border-radius:4px; cursor:zoom-in; background:#fff; }
-    #imgModalPic { max-width:95%; max-height:95%; object-fit:contain; }
-    .student-info { margin-bottom:10px; }
-    .schedule-info { font-size:12px; font-weight:normal; }
-  </style>
+
+    #qImgWrap img {
+      width: 100%;
+      max-height: 520px;
+      object-fit: contain;
+      display: block;
+      margin: 12px auto;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      cursor: zoom-in;
+      background: #fff;
+    }
+
+    #imgModalPic {
+      max-width: 95%;
+      max-height: 95%;
+      object-fit: contain;
+    }
+
+    .student-info { margin-bottom: 10px; }
+    .schedule-info { font-size: 12px; font-weight: normal; }
+
+    /* Candidate ID in exam header */
+    .candidate-id-display {
+      font-size: 12px;
+      font-weight: bold;
+      white-space: nowrap;
+    }
+
+    @media (max-width: 768px) {
+      .candidate-id-display {
+        display: block;
+        margin-top: 3px;
+        font-size: 12px;
+      }
+    }
+</style>
 </head>
+
 <body>
+
   <header class="topbar">
-    <div>DAMS TRIVANDRUM - NEET PG CBT <span class="schedule-info"> | IST: <span id="istClock">--</span></span></div>
+    <div>
+      DAMS TRIVANDRUM - NEET PG CBT
+
+      <span class="candidate-id-display">
+        | Candidate ID: <b id="candidateIdDisplay">--</b>
+      </span>
+
+      <span class="schedule-info">
+        | IST: <span id="istClock">--</span>
+      </span>
+    </div>
+
     <div>
       Time Left: <b id="timeLeft">60:00</b>
       &nbsp; | &nbsp;
@@ -373,12 +419,19 @@
   </header>
 
   <div class="layout">
+
     <main class="main">
       <div class="qbox">
+
         <div class="student-info" id="studentInfo"></div>
+
         <div class="student-info schedule-info">
-          Exam window: <span id="examStartIST">--</span> to <span id="examEndIST">--</span>
+          Exam window:
+          <span id="examStartIST">--</span>
+          to
+          <span id="examEndIST">--</span>
         </div>
+
         <div id="qTitle" class="qtitle">Loading examination...</div>
         <div id="qText" class="qtext"></div>
         <div id="qImgWrap"></div>
@@ -390,16 +443,20 @@
           <button id="markBtn" type="button">Mark for Review</button>
           <button id="nextBtn" type="button">Next</button>
         </div>
+
         <div class="actions">
           <button id="submitBtn" class="danger" type="button">Submit</button>
         </div>
+
         <div class="warning" id="warning"></div>
+
       </div>
     </main>
 
     <aside class="palette" id="paletteBox">
       <h3>Questions</h3>
       <div id="pal"></div>
+
       <div class="legend">
         <div><span class="dot unanswered"></span> Unanswered</div>
         <div><span class="dot answered"></span> Answered</div>
@@ -407,6 +464,7 @@
         <div><span class="dot ansreview"></span> Answered + Marked</div>
       </div>
     </aside>
+
   </div>
 
   <div id="imgModal" class="img-modal" aria-hidden="true">
@@ -414,6 +472,7 @@
       <button id="imgFullBtn" type="button">Fullscreen</button>
       <button id="imgCloseBtn" class="danger" type="button">Close</button>
     </div>
+
     <div class="img-modal-body">
       <img id="imgModalPic" alt="Question image enlarged" />
     </div>
@@ -422,5 +481,31 @@
   <!-- Load configuration first, then the single exam controller. -->
   <script src="config.js?v=20261110a"></script>
   <script src="exam.js?v=20261110a"></script>
+
+  <!-- Display logged-in Candidate ID -->
+  <script>
+    (function () {
+      try {
+        const candidate = JSON.parse(
+          sessionStorage.getItem("neet_candidate") || "{}"
+        );
+
+        const candidateId =
+          candidate.candidateId || candidate.id || "";
+
+        const display = document.getElementById("candidateIdDisplay");
+
+        if (display) {
+          display.textContent = candidateId || "Not available";
+        }
+      } catch (error) {
+        const display = document.getElementById("candidateIdDisplay");
+        if (display) {
+          display.textContent = "Not available";
+        }
+      }
+    })();
+  </script>
+
 </body>
 </html>
